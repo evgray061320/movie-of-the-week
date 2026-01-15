@@ -6,6 +6,8 @@ let useDatabase = false;
 let dbQueries = null;
 
 // Try to use database if DATABASE_URL is set
+// Note: initializeDatabase() must be called before using the database
+// This is done asynchronously and won't block server startup
 if (process.env.DATABASE_URL) {
   try {
     const { initializeDatabase } = require('./db');
@@ -13,10 +15,11 @@ if (process.env.DATABASE_URL) {
     useDatabase = true;
     console.log('🗄️  Using PostgreSQL database');
     
-    // Initialize schema on startup
+    // Initialize schema on startup (fire-and-forget, errors won't crash server)
     initializeDatabase().catch(err => {
-      console.error('Warning: Database initialization failed, using JSON fallback:', err.message);
-      useDatabase = false;
+      console.error('Warning: Database initialization failed:', err.message);
+      // Don't disable useDatabase here - let individual queries handle errors
+      // The database might still work even if initialization has warnings
     });
   } catch (error) {
     console.warn('⚠️  Database not available, using JSON file:', error.message);
@@ -52,7 +55,12 @@ function saveJSON(data) {
 const data = {
   async users() {
     if (useDatabase && dbQueries) {
-      return await dbQueries.getAllUsers();
+      try {
+        return await dbQueries.getAllUsers();
+      } catch (err) {
+        console.error('Database query failed, falling back to JSON:', err.message);
+        // Fall through to JSON fallback
+      }
     }
     const json = loadJSON();
     return json.users || [];
@@ -411,7 +419,12 @@ const data = {
   
   async getGlobalSeason() {
     if (useDatabase && dbQueries) {
-      return await dbQueries.getGlobalSeason();
+      try {
+        return await dbQueries.getGlobalSeason();
+      } catch (err) {
+        console.error('Database query failed, falling back to JSON:', err.message);
+        // Fall through to JSON fallback
+      }
     }
     const json = loadJSON();
     if (!json.season) {

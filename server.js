@@ -67,8 +67,9 @@ async function checkAndResetSeason() {
   return false;
 }
 
-// Initialize on server start
-(async () => {
+// Initialize on server start (wait a bit for database to be ready)
+// This runs after the server starts to avoid blocking startup
+setTimeout(async () => {
   try {
     await checkAndResetSeason();
     const season = await data.getGlobalSeason();
@@ -77,9 +78,10 @@ async function checkAndResetSeason() {
       await data.updateGlobalSeason({ currentWeek });
     }
   } catch (err) {
-    console.error('Error initializing season:', err);
+    // Don't crash server if season initialization fails
+    console.error('Error initializing season (non-critical):', err.message);
   }
-})();
+}, 2000); // Wait 2 seconds for database to be ready
 
 // Twilio removed — SMS paths have been removed in favor of email notifications.
 
