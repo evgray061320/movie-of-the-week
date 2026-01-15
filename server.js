@@ -957,6 +957,66 @@ app.get('/season/user-status/:userId', (req, res) => {
   });
 });
 
+// Get submission summary by user for admin view
+app.get('/group/:id/submissions-summary', (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.query; // Admin userId for authorization
+  const group = db.groups.find(g => g.id === id);
+  if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
+
+  const admins = group.admins || [group.creatorId];
+  if (!userId || !admins.includes(userId)) {
+    return res.status(403).json({ ok: false, error: 'only admins can view submission summary' });
+  }
+
+  const seasonNumber = group?.season?.number || 1;
+  const members = group.members || [];
+  
+  // Get all submissions for this group and season
+  const groupSubmissions = db.submissions.filter(s => 
+    s.groupId === id && s.seasonNumber === seasonNumber
+  );
+
+  // Group submissions by user
+  const userSummaries = members.map(memberId => {
+    const user = db.users.find(u => u.id === memberId);
+    const userSubs = groupSubmissions.filter(s => s.userId === memberId);
+    
+    // Organize by category
+    const byCategory = {};
+    userSubs.forEach(sub => {
+      if (!byCategory[sub.category]) {
+        byCategory[sub.category] = [];
+      }
+      byCategory[sub.category].push({
+        title: sub.title,
+        description: sub.description,
+        posterUrl: sub.posterUrl,
+        submittedAt: sub.submittedAt
+      });
+    });
+
+    return {
+      userId: memberId,
+      username: user?.username || user?.name || 'Unknown',
+      isAdmin: admins.includes(memberId),
+      submissionCount: userSubs.length,
+      submissionsByCategory: byCategory,
+      categories: Object.keys(byCategory)
+    };
+  });
+
+  // Sort by submission count (descending), then by username
+  userSummaries.sort((a, b) => {
+    if (b.submissionCount !== a.submissionCount) {
+      return b.submissionCount - a.submissionCount;
+    }
+    return (a.username || '').localeCompare(b.username || '');
+  });
+
+  res.json({ ok: true, summaries: userSummaries, totalSubmissions: groupSubmissions.length });
+});
+
 const HOST = process.env.HOST || '0.0.0.0';
 app.listen(PORT, HOST, () => {
   console.log(`Server listening on ${HOST}:${PORT}`);

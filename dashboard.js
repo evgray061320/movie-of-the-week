@@ -103,6 +103,11 @@ let clubsModal;
 let closeClubsModalBtn;
 let clubsModalListEl;
 let clubsModalStatusEl;
+let userSubmissionsModal;
+let closeUserSubmissionsModalBtn;
+let userSubmissionsListEl;
+let userSubmissionsStatusEl;
+let viewUserSubmissionsBtn;
 let startNewSeasonBtn;
 let headerClubNameEl;
 
@@ -645,6 +650,136 @@ async function switchToClub(club) {
 	if (clubsModal) clubsModal.classList.add('hidden');
 }
 
+function openUserSubmissionsModal() {
+	if (!userSubmissionsModal) {
+		userSubmissionsModal = document.getElementById('user-submissions-modal');
+	}
+	if (!userSubmissionsModal) return;
+	userSubmissionsModal.classList.remove('hidden');
+	loadUserSubmissions();
+}
+
+async function loadUserSubmissions() {
+	if (!userSubmissionsStatusEl) userSubmissionsStatusEl = document.getElementById('user-submissions-status');
+	if (!userSubmissionsListEl) userSubmissionsListEl = document.getElementById('user-submissions-list');
+	if (!currentUser?.id || !currentGroup?.id || !userSubmissionsListEl) return;
+	
+	if (userSubmissionsStatusEl) {
+		userSubmissionsStatusEl.textContent = 'Loading submission summary...';
+		userSubmissionsStatusEl.className = 'status';
+	}
+	
+	try {
+		const res = await fetch(`${SERVER_URL}/group/${currentGroup.id}/submissions-summary?userId=${currentUser.id}`);
+		const data = await res.json();
+		
+		if (!res.ok || !data.ok) {
+			throw new Error(data.error || 'Failed to load submission summary');
+		}
+		
+		renderUserSubmissions(data.summaries || [], data.totalSubmissions || 0);
+		if (userSubmissionsStatusEl) userSubmissionsStatusEl.textContent = '';
+	} catch (err) {
+		console.error('Failed to load user submissions', err);
+		if (userSubmissionsStatusEl) {
+			userSubmissionsStatusEl.textContent = '❌ Could not load submission summary.';
+			userSubmissionsStatusEl.className = 'status error';
+		}
+	}
+}
+
+function renderUserSubmissions(summaries, totalSubmissions) {
+	if (!userSubmissionsListEl) return;
+	
+	if (!Array.isArray(summaries) || summaries.length === 0) {
+		userSubmissionsListEl.innerHTML = '<p class="no-reviews">No members found.</p>';
+		return;
+	}
+	
+	userSubmissionsListEl.innerHTML = `
+		<div style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px;">
+			<strong style="color: var(--text-primary);">Total Submissions:</strong>
+			<span style="color: var(--gold); font-size: 1.2rem; font-weight: 700; margin-left: 0.5rem;">${totalSubmissions}</span>
+		</div>
+	`;
+	
+	summaries.forEach((summary) => {
+		const userCard = document.createElement('div');
+		userCard.style.cssText = 'background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem;';
+		
+		const adminBadge = summary.isAdmin ? '<span style="background: var(--gold); color: var(--bg-dark); padding: 0.25rem 0.5rem; border-radius: 8px; font-size: 0.75rem; font-weight: 700; margin-left: 0.5rem;">ADMIN</span>' : '';
+		
+		userCard.innerHTML = `
+			<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+				<h3 style="margin: 0; color: var(--text-primary); display: flex; align-items: center;">
+					${escapeHtml(summary.username || 'Unknown')}${adminBadge}
+				</h3>
+				<span style="color: var(--text-secondary); font-size: 0.9rem;">
+					${summary.submissionCount} submission${summary.submissionCount !== 1 ? 's' : ''}
+				</span>
+			</div>
+		`;
+		
+		if (summary.submissionCount === 0) {
+			const emptyMsg = document.createElement('p');
+			emptyMsg.style.cssText = 'color: var(--text-secondary); font-style: italic; margin: 0; padding: 1rem; background: rgba(255, 255, 255, 0.03); border-radius: 8px;';
+			emptyMsg.textContent = 'No submissions yet';
+			userCard.appendChild(emptyMsg);
+		} else {
+			const submissionsContainer = document.createElement('div');
+			submissionsContainer.style.cssText = 'display: flex; flex-direction: column; gap: 0.75rem;';
+			
+			Object.keys(summary.submissionsByCategory).forEach((category) => {
+				const categoryDiv = document.createElement('div');
+				categoryDiv.style.cssText = 'padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px;';
+				
+				const categoryDisplayName = category.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+				const categoryIcon = category === 'top-pick' ? '⭐' : category === 'wild-card' ? '🎲' : category === 'fan-favorite' ? '❤️' : '🎬';
+				
+				categoryDiv.innerHTML = `
+					<div style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">
+						${categoryIcon} ${categoryDisplayName}
+					</div>
+				`;
+				
+				summary.submissionsByCategory[category].forEach((sub) => {
+					const subDiv = document.createElement('div');
+					subDiv.style.cssText = 'margin-left: 1rem; padding: 0.5rem; border-left: 2px solid var(--border-color);';
+					
+					const posterHtml = sub.posterUrl 
+						? `<img src="${escapeHtml(sub.posterUrl)}" alt="${escapeHtml(sub.title)}" style="width: 50px; height: 75px; object-fit: cover; border-radius: 4px; margin-right: 0.75rem; float: left;">`
+						: '';
+					
+					subDiv.innerHTML = `
+						<div style="display: flex; align-items: start;">
+							${posterHtml}
+							<div style="flex: 1;">
+								<div style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">
+									${escapeHtml(sub.title)}
+								</div>
+								<div style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.25rem;">
+									${escapeHtml(sub.description || 'No description')}
+								</div>
+								<div style="color: var(--text-secondary); font-size: 0.8rem; opacity: 0.7;">
+									Submitted: ${new Date(sub.submittedAt).toLocaleDateString()}
+								</div>
+							</div>
+						</div>
+						<div style="clear: both;"></div>
+					`;
+					categoryDiv.appendChild(subDiv);
+				});
+				
+				submissionsContainer.appendChild(categoryDiv);
+			});
+			
+			userCard.appendChild(submissionsContainer);
+		}
+		
+		userSubmissionsListEl.appendChild(userCard);
+	});
+}
+
 function setupProfileAndLogoutHandlers() {
 	// Get elements
 	const closeProfileModalEl = document.getElementById('close-profile-modal');
@@ -686,6 +821,11 @@ function setupProfileAndLogoutHandlers() {
 	closeClubsModalBtn = document.getElementById('close-clubs-modal');
 	clubsModalListEl = document.getElementById('clubs-modal-list');
 	clubsModalStatusEl = document.getElementById('clubs-modal-status');
+	userSubmissionsModal = document.getElementById('user-submissions-modal');
+	closeUserSubmissionsModalBtn = document.getElementById('close-user-submissions-modal');
+	userSubmissionsListEl = document.getElementById('user-submissions-list');
+	userSubmissionsStatusEl = document.getElementById('user-submissions-status');
+	viewUserSubmissionsBtn = document.getElementById('view-user-submissions-btn');
 	startNewSeasonBtn = document.getElementById('start-new-season-btn');
 	headerClubNameEl = document.getElementById('club-header-name');
 
@@ -706,6 +846,24 @@ function setupProfileAndLogoutHandlers() {
 	if (closeClubsModalBtn && clubsModal) {
 		closeClubsModalBtn.addEventListener('click', () => {
 			clubsModal.classList.add('hidden');
+		});
+	}
+
+	if (closeUserSubmissionsModalBtn && userSubmissionsModal) {
+		closeUserSubmissionsModalBtn.addEventListener('click', () => {
+			userSubmissionsModal.classList.add('hidden');
+		});
+	}
+
+	if (userSubmissionsModal) {
+		userSubmissionsModal.addEventListener('click', (e) => {
+			if (e.target === userSubmissionsModal) userSubmissionsModal.classList.add('hidden');
+		});
+	}
+
+	if (viewUserSubmissionsBtn) {
+		viewUserSubmissionsBtn.addEventListener('click', () => {
+			openUserSubmissionsModal();
 		});
 	}
 

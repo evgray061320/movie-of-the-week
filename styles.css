@@ -839,6 +839,29 @@ select.form-input:focus {
   transform: none;
 }
 
+/* ===== MODAL BUTTON GROUP ===== */
+.modal-button-group {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.modal-button-group .btn {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .modal-button-group {
+    flex-direction: column;
+  }
+  
+  .modal-button-group .btn {
+    width: 100%;
+    flex: none;
+  }
+}
+
 /* ===== CONTROLS ===== */
 .controls {
   display: grid;
