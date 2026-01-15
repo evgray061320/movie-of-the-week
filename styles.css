@@ -41,6 +41,9 @@ html {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* Android Chrome fix for preventing zoom on input focus */
+  -webkit-tap-highlight-color: rgba(212, 175, 55, 0.3);
+  tap-highlight-color: rgba(212, 175, 55, 0.3);
 }
 
 body {
@@ -164,6 +167,10 @@ header::after {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  min-height: 44px; /* Android Material Design minimum touch target */
+  min-width: 44px;
+  touch-action: manipulation; /* Improve touch response on Android */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .menu-panel {
@@ -198,6 +205,11 @@ header::after {
   cursor: pointer;
   font-size: 0.95rem;
   transition: var(--transition-fast);
+  min-height: 44px; /* Android Material Design minimum touch target */
+  display: flex;
+  align-items: center;
+  touch-action: manipulation; /* Improve touch response on Android */
+  -webkit-tap-highlight-color: rgba(212, 175, 55, 0.2);
 }
 
 .menu-item:hover {
@@ -626,13 +638,16 @@ select.form-input {
   border: 1px solid var(--border-color);
   border-radius: 16px;
   font-family: inherit;
-  font-size: 1rem;
+  font-size: 16px; /* Minimum 16px to prevent Android Chrome auto-zoom */
   transition: var(--transition);
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: var(--text-primary);
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  touch-action: manipulation; /* Improve touch response on Android */
+  -webkit-appearance: none; /* Remove default Android styling */
+  appearance: none;
 }
 
 select.form-input {
@@ -704,6 +719,11 @@ select.form-input:focus {
 .btn-link {
   padding: 0.6rem 1rem;
   font-size: 0.85rem;
+  min-height: 44px; /* Android Material Design minimum touch target */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation; /* Improve touch response on Android */
 }
 
 .form-status {
@@ -793,6 +813,9 @@ select.form-input:focus {
   letter-spacing: 0.3px;
   position: relative;
   overflow: hidden;
+  min-height: 44px; /* Android Material Design minimum touch target */
+  touch-action: manipulation; /* Improve touch response on Android */
+  -webkit-tap-highlight-color: transparent; /* Remove default tap highlight */
 }
 
 .btn-primary {
@@ -874,6 +897,14 @@ select.form-input:focus {
   .modal-button-group .btn {
     width: 100%;
     flex: none;
+    min-height: 44px; /* Android Material Design minimum touch target */
+  }
+  
+  /* Ensure all form inputs maintain 16px font size to prevent Android zoom */
+  .form-input,
+  .form-textarea,
+  .form-select {
+    font-size: 16px !important;
   }
 
   .category-requirements {
@@ -935,6 +966,16 @@ select.form-input:focus {
   .btn {
     padding: 0.75rem 1rem;
     font-size: 0.85rem;
+    min-height: 44px; /* Android Material Design minimum touch target */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .form-input,
+  .form-textarea,
+  .form-select {
+    font-size: 16px; /* Prevent Android auto-zoom (minimum 16px) */
   }
 
   .submissions-grid {
@@ -2031,6 +2072,10 @@ main:not(.main-hidden) {
     width: 100%;
     padding: 0.875rem 1.25rem;
     font-size: 0.9rem;
+    min-height: 44px; /* Android Material Design minimum touch target */
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .form-inline {
@@ -2092,7 +2137,7 @@ main:not(.main-hidden) {
   .form-input,
   .form-textarea,
   .form-select {
-    font-size: 0.9rem;
+    font-size: 16px; /* Prevent Android auto-zoom (minimum 16px) */
     padding: 0.75rem;
   }
 
@@ -2108,6 +2153,11 @@ main:not(.main-hidden) {
   .menu-toggle {
     padding: 0.5rem 0.75rem;
     font-size: 0.85rem;
+    min-height: 44px; /* Android Material Design minimum touch target */
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .menu-panel {

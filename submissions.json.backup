@@ -1,0 +1,705 @@
+{
+  "submissions": [
+    {
+      "id": "mkfy24k7",
+      "title": "Inside Out",
+      "description": "A joyful, heartwarming adventure.",
+      "category": "wild-card",
+      "posterUrl": null,
+      "userId": "mkfu8xlm",
+      "groupId": "mkfxtyv3",
+      "submittedAt": "2026-01-15T21:10:55.639Z",
+      "seasonNumber": 1
+    },
+    {
+      "id": "mkfy24kd",
+      "title": "The Godfather",
+      "description": "A classic tale of family and power.",
+      "category": "fan-favorite",
+      "posterUrl": null,
+      "userId": "mkfu8xlm",
+      "groupId": "mkfxtyv3",
+      "submittedAt": "2026-01-15T21:10:55.645Z",
+      "seasonNumber": 1
+    },
+    {
+      "id": "mkfy6vpc",
+      "title": "Marcel the Shell",
+      "description": "surprisingly good",
+      "category": "wild-card",
+      "posterUrl": "https://m.media-amazon.com/images/M/MV5BMmVhYWEzMGEtZjhkYS00ZWE0LTlhOWQtZTRlODZlMTM0Y2JmXkEyXkFqcGc@._V1_SX300.jpg",
+      "userId": "mkfu8xlm",
+      "groupId": "mkfy63rz",
+      "submittedAt": "2026-01-15T21:14:37.440Z",
+      "seasonNumber": 1
+    },
+    {
+      "id": "mkfy77i2",
+      "title": "The Notebook",
+      "description": "They die together",
+      "category": "fan-favorite",
+      "posterUrl": "https://m.media-amazon.com/images/M/MV5BZjE0ZjgzMzYtMTAxYi00NGMzLThmZDktNzFlMzA2MWRmYWQ0XkEyXkFqcGc@._V1_SX300.jpg",
+      "userId": "mkfu8xlm",
+      "groupId": "mkfy63rz",
+      "submittedAt": "2026-01-15T21:14:52.730Z",
+      "seasonNumber": 1
+    }
+  ],
+  "history": [
+    {
+      "id": "mkfy7ig0",
+      "winners": [
+        {
+          "id": "mkfy77i2",
+          "title": "The Notebook",
+          "description": "They die together",
+          "category": "fan-favorite",
+          "posterUrl": "https://m.media-amazon.com/images/M/MV5BZjE0ZjgzMzYtMTAxYi00NGMzLThmZDktNzFlMzA2MWRmYWQ0XkEyXkFqcGc@._V1_SX300.jpg",
+          "userId": "mkfu8xlm",
+          "groupId": "mkfy63rz",
+          "submittedAt": "2026-01-15T21:14:52.730Z",
+          "seasonNumber": 1,
+          "submittedBy": "Eleanor"
+        },
+        {
+          "id": "mkfy6vpc",
+          "title": "Marcel the Shell",
+          "description": "surprisingly good",
+          "category": "wild-card",
+          "posterUrl": "https://m.media-amazon.com/images/M/MV5BMmVhYWEzMGEtZjhkYS00ZWE0LTlhOWQtZTRlODZlMTM0Y2JmXkEyXkFqcGc@._V1_SX300.jpg",
+          "userId": "mkfu8xlm",
+          "groupId": "mkfy63rz",
+          "submittedAt": "2026-01-15T21:14:37.440Z",
+          "seasonNumber": 1,
+          "submittedBy": "Eleanor"
+        }
+      ],
+      "winner": {
+        "id": "mkfy77i2",
+        "title": "The Notebook",
+        "description": "They die together",
+        "category": "fan-favorite",
+        "posterUrl": "https://m.media-amazon.com/images/M/MV5BZjE0ZjgzMzYtMTAxYi00NGMzLThmZDktNzFlMzA2MWRmYWQ0XkEyXkFqcGc@._V1_SX300.jpg",
+        "userId": "mkfu8xlm",
+        "groupId": "mkfy63rz",
+        "submittedAt": "2026-01-15T21:14:52.730Z",
+        "seasonNumber": 1,
+        "submittedBy": "Eleanor"
+      },
+      "pickedAt": "2026-01-15T21:15:06.912Z",
+      "submissionsCount": 2,
+      "groupId": "mkfy63rz",
+      "seasonNumber": 1
+    },
+    {
+      "id": "mkfy24kh",
+      "winners": [
+        {
+          "id": "mkfy24kd",
+          "title": "The Godfather",
+          "description": "A classic tale of family and power.",
+          "category": "fan-favorite",
+          "posterUrl": null,
+          "userId": "mkfu8xlm",
+          "groupId": "mkfxtyv3",
+          "submittedAt": "2026-01-15T21:10:55.645Z",
+          "seasonNumber": 1,
+          "submittedBy": "Eleanor"
+        },
+        {
+          "id": "mkfy24k7",
+          "title": "Inside Out",
+          "description": "A joyful, heartwarming adventure.",
+          "category": "wild-card",
+          "posterUrl": null,
+          "userId": "mkfu8xlm",
+          "groupId": "mkfxtyv3",
+          "submittedAt": "2026-01-15T21:10:55.639Z",
+          "seasonNumber": 1,
+          "submittedBy": "Eleanor"
+        }
+      ],
+      "winner": {
+        "id": "mkfy24kd",
+        "title": "The Godfather",
+        "description": "A classic tale of family and power.",
+        "category": "fan-favorite",
+        "posterUrl": null,
+        "userId": "mkfu8xlm",
+        "groupId": "mkfxtyv3",
+        "submittedAt": "2026-01-15T21:10:55.645Z",
+        "seasonNumber": 1,
+        "submittedBy": "Eleanor"
+      },
+      "pickedAt": "2026-01-15T21:10:55.650Z",
+      "submissionsCount": 2,
+      "groupId": "mkfxtyv3",
+      "seasonNumber": 1
+    },
+    {
+      "id": "mkfxyi37",
+      "winner": {
+        "id": "mkfxyi22",
+        "title": "Finding Nemo",
+        "description": "A heartfelt adventure under the sea.",
+        "category": "wild-card",
+        "posterUrl": null,
+        "userId": "mkfu8xlm",
+        "groupId": "mkfumfhq",
+        "submittedAt": "2026-01-15T21:08:06.506Z",
+        "seasonNumber": 1
+      },
+      "category": "wild-card",
+      "pickedAt": "2026-01-15T21:08:06.547Z",
+      "submissionsCount": 1
+    },
+    {
+      "id": "mkfxv3jj",
+      "winner": {
+        "id": "mkfxuc53",
+        "title": "San Andreas",
+        "description": "oirgnfslkd nvgrsg",
+        "category": "wild-card",
+        "posterUrl": "https://m.media-amazon.com/images/M/MV5BYmQzNDEzMzMtM2U5OS00YTUzLWI2NDYtYjI2NjAyNWE5YzMzXkEyXkFqcGc@._V1_SX300.jpg",
+        "userId": "mkfu8xlm",
+        "groupId": "mkfxtyv3",
+        "submittedAt": "2026-01-15T21:04:52.215Z",
+        "seasonNumber": 1
+      },
+      "category": "wild-card",
+      "pickedAt": "2026-01-15T21:05:27.727Z",
+      "submissionsCount": 2
+    },
+    {
+      "id": "mkftuthn",
+      "winner": {
+        "id": "mkftufyd",
+        "title": "About Time",
+        "description": "Romance fun woo",
+        "category": "top-pick",
+        "posterUrl": "https://m.media-amazon.com/images/M/MV5BMTA1ODUzMDA3NzFeQTJeQWpwZ15BbWU3MDgxMTYxNTk@._V1_SX300.jpg",
+        "userId": "mkfts7id",
+        "groupId": "mkftskol",
+        "submittedAt": "2026-01-15T19:12:58.693Z",
+        "seasonNumber": 1
+      },
+      "category": "top-pick",
+      "pickedAt": "2026-01-15T19:13:16.235Z",
+      "submissionsCount": 6
+    },
+    {
+      "id": "mkfn9wx6",
+      "winner": {
+        "id": "mkfn9uob",
+        "title": "Test Movie",
+        "description": "A test description longer than ten characters",
+        "posterUrl": null,
+        "submittedAt": "2026-01-15T16:09:00.299Z"
+      },
+      "pickedAt": "2026-01-15T16:09:03.210Z",
+      "submissionsCount": 3
+    }
+  ],
+  "users": [
+    {
+      "id": "mkfniwhz",
+      "name": "John Smith",
+      "email": "john@example.com",
+      "genres": [
+        "Action",
+        "Sci-Fi"
+      ],
+      "createdAt": "2026-01-15T16:16:02.567Z",
+      "groupId": "mkfnj06v"
+    },
+    {
+      "id": "mkfnj4qb",
+      "name": "Jane Doe",
+      "email": "jane@example.com",
+      "genres": [
+        "Drama",
+        "Thriller"
+      ],
+      "createdAt": "2026-01-15T16:16:13.235Z",
+      "groupId": "mkfnj06v"
+    },
+    {
+      "id": "mkfnr8ww",
+      "name": "Eleanor",
+      "email": "eleanorwalker2013@gmail.com",
+      "genres": [
+        "Horror",
+        "Thriller"
+      ],
+      "createdAt": "2026-01-15T16:22:31.904Z",
+      "groupId": "mkfnr8x8"
+    },
+    {
+      "id": "mkfntuut",
+      "name": "Eleanor",
+      "email": "email@email.com",
+      "genres": [
+        "Horror",
+        "Thriller"
+      ],
+      "createdAt": "2026-01-15T16:24:33.653Z",
+      "groupId": "mkfntuv1"
+    },
+    {
+      "id": "mkfnv52x",
+      "name": "Eleanor",
+      "email": "Email@email.com",
+      "genres": [
+        "Horror",
+        "Thriller"
+      ],
+      "createdAt": "2026-01-15T16:25:33.561Z",
+      "groupId": "mkfnr8x8"
+    },
+    {
+      "id": "mkfnvftf",
+      "name": "Alice",
+      "email": "alice@test.com",
+      "genres": [
+        "Drama"
+      ],
+      "createdAt": "2026-01-15T16:25:47.475Z",
+      "groupId": null
+    },
+    {
+      "id": "mkfnvmjg",
+      "name": "TestUser1",
+      "email": "test1@example.com",
+      "genres": [
+        "Action",
+        "Sci-Fi"
+      ],
+      "createdAt": "2026-01-15T16:25:56.188Z",
+      "groupId": "mkfnvssx"
+    },
+    {
+      "id": "mkfnvzin",
+      "name": "TestUser2",
+      "email": "test2@example.com",
+      "genres": [
+        "Comedy"
+      ],
+      "createdAt": "2026-01-15T16:26:13.007Z",
+      "groupId": "mkfnvssx"
+    },
+    {
+      "id": "mkfnz6zx",
+      "name": "Eleanor",
+      "email": "email@email.com",
+      "genres": [
+        "Horror",
+        "Thriller"
+      ],
+      "createdAt": "2026-01-15T16:28:42.669Z",
+      "groupId": "mkfnr8x8"
+    },
+    {
+      "id": "mkfpcoai",
+      "name": "Eleanor",
+      "email": "email@email.com",
+      "genres": [
+        "Thriller",
+        "Fantasy"
+      ],
+      "createdAt": "2026-01-15T17:07:11.226Z",
+      "groupId": "mkfpcod2"
+    },
+    {
+      "id": "mkfslfcw",
+      "name": "Eleanor",
+      "email": "email@email.com",
+      "genres": [
+        "Comedy"
+      ],
+      "createdAt": "2026-01-15T18:37:58.400Z",
+      "groupId": "mkfslfdb"
+    },
+    {
+      "id": "mkfstgzx",
+      "name": "Eleanor",
+      "email": "email@email.com",
+      "genres": [
+        "Thriller",
+        "Fantasy"
+      ],
+      "createdAt": "2026-01-15T18:44:13.773Z",
+      "groupId": "mkfsww3m"
+    },
+    {
+      "id": "mkft3mkr",
+      "name": "Eleanor",
+      "email": "email@email.com",
+      "genres": [
+        "Thriller"
+      ],
+      "createdAt": "2026-01-15T18:52:07.563Z",
+      "groupId": "mkft4sz6"
+    },
+    {
+      "id": "mkfts193",
+      "name": "E",
+      "email": "ee@mail.com",
+      "genres": [
+        "Fantasy"
+      ],
+      "createdAt": "2026-01-15T19:11:06.327Z",
+      "groupId": null
+    },
+    {
+      "id": "mkfts19f",
+      "name": "E",
+      "email": "ee@mail.com",
+      "genres": [
+        "Fantasy"
+      ],
+      "createdAt": "2026-01-15T19:11:06.339Z",
+      "groupId": null
+    },
+    {
+      "id": "mkfts7id",
+      "name": "Eleanor",
+      "email": "e@mail.com",
+      "genres": [
+        "Thriller"
+      ],
+      "createdAt": "2026-01-15T19:11:14.437Z",
+      "groupId": "mkftskol"
+    },
+    {
+      "id": "mkftvf34",
+      "name": "e",
+      "email": "e@mail.com",
+      "genres": [
+        "Thriller"
+      ],
+      "createdAt": "2026-01-15T19:13:44.224Z",
+      "groupId": null
+    },
+    {
+      "id": "mkfu8xlm",
+      "username": "Eleanor",
+      "name": "Eleanor",
+      "password": "passpass1",
+      "securityQuestion": "school",
+      "securityAnswer": "colonial hills",
+      "genres": [
+        "Horror",
+        "Thriller"
+      ],
+      "createdAt": "2026-01-15T19:24:14.746Z",
+      "groupId": "mkfy63rz"
+    },
+    {
+      "id": "mkfz9ru5",
+      "username": "EleanorGray",
+      "name": "EleanorGray",
+      "password": "Passpass1",
+      "securityQuestion": "school",
+      "securityAnswer": "colonial hills",
+      "genres": [
+        "Horror",
+        "Thriller"
+      ],
+      "createdAt": "2026-01-15T21:44:52.013Z",
+      "groupId": "mkfza9yb"
+    }
+  ],
+  "groups": [
+    {
+      "id": "mkfnj06v",
+      "name": "Indie Film Lovers",
+      "creatorId": "mkfniwhz",
+      "code": "I068AC",
+      "members": [
+        "mkfniwhz",
+        "mkfnj4qb"
+      ],
+      "createdAt": "2026-01-15T16:16:07.351Z"
+    },
+    {
+      "id": "mkfnr8x8",
+      "name": "2026 Fantasy Movie League",
+      "creatorId": "mkfnr8ww",
+      "code": "3TCNNY",
+      "members": [
+        "mkfnr8ww",
+        "mkfnv52x",
+        "mkfnz6zx"
+      ],
+      "createdAt": "2026-01-15T16:22:31.916Z"
+    },
+    {
+      "id": "mkfntuv1",
+      "name": "2026 Fantasy Movie League",
+      "creatorId": "mkfntuut",
+      "code": "4BVSF8",
+      "members": [
+        "mkfntuut"
+      ],
+      "createdAt": "2026-01-15T16:24:33.661Z"
+    },
+    {
+      "id": "mkfnvssx",
+      "name": "Cinema Lovers",
+      "creatorId": "mkfnvmjg",
+      "code": "N7CHGZ",
+      "members": [
+        "mkfnvmjg",
+        "mkfnvzin"
+      ],
+      "createdAt": "2026-01-15T16:26:04.305Z"
+    },
+    {
+      "id": "mkfpcod2",
+      "name": "2026 Fantasy Movie League",
+      "creatorId": "mkfpcoai",
+      "code": "A6A87B",
+      "members": [
+        "mkfpcoai"
+      ],
+      "createdAt": "2026-01-15T17:07:11.318Z"
+    },
+    {
+      "id": "mkfslfdb",
+      "name": "2026 Fantasy Movie League",
+      "creatorId": "mkfslfcw",
+      "code": "AY56F4",
+      "members": [
+        "mkfslfcw"
+      ],
+      "createdAt": "2026-01-15T18:37:58.416Z"
+    },
+    {
+      "id": "mkfsww3m",
+      "name": "2026 Fantasy Movie League",
+      "creatorId": "mkfstgzx",
+      "code": "AKMRGX",
+      "members": [
+        "mkfstgzx"
+      ],
+      "createdAt": "2026-01-15T18:46:53.315Z"
+    },
+    {
+      "id": "mkft4sz6",
+      "name": "Movie Club",
+      "creatorId": "mkft3mkr",
+      "code": "HWL2PC",
+      "members": [
+        "mkft3mkr"
+      ],
+      "createdAt": "2026-01-15T18:53:02.514Z"
+    },
+    {
+      "id": "mkftskol",
+      "name": "Movie Draft",
+      "creatorId": "mkfts7id",
+      "code": "PR2BDP",
+      "members": [
+        "mkfts7id"
+      ],
+      "createdAt": "2026-01-15T19:11:31.509Z",
+      "settings": {
+        "seasonLength": 14,
+        "submissionsPerUser": 2,
+        "categories": [
+          "top-pick",
+          "wild-card"
+        ]
+      },
+      "season": {
+        "number": 1,
+        "startDate": "2026-01-15T19:11:39.560Z",
+        "currentWeek": 1,
+        "endDate": null
+      }
+    },
+    {
+      "id": "mkfxtyv3",
+      "name": "Movie Club",
+      "creatorId": "mkfu8xlm",
+      "code": "KAT1Z2",
+      "members": [
+        "mkfu8xlm"
+      ],
+      "createdAt": "2026-01-15T21:04:35.008Z",
+      "settings": {
+        "seasonLength": 14,
+        "submissionsPerUser": 2,
+        "categories": [
+          "fan-favorite",
+          "wild-card"
+        ]
+      },
+      "season": {
+        "number": 1,
+        "startDate": "2026-01-15T21:04:37.511Z",
+        "currentWeek": 1,
+        "endDate": null
+      }
+    },
+    {
+      "id": "mkfy63rz",
+      "name": "Movie Club",
+      "creatorId": "mkfu8xlm",
+      "code": "QZQ16W",
+      "members": [
+        "mkfu8xlm"
+      ],
+      "createdAt": "2026-01-15T21:14:01.247Z",
+      "settings": {
+        "seasonLength": 14,
+        "submissionsPerUser": 2,
+        "categories": [
+          "fan-favorite",
+          "wild-card"
+        ]
+      },
+      "season": {
+        "number": 1,
+        "startDate": "2026-01-15T21:14:05.185Z",
+        "currentWeek": 1,
+        "endDate": null
+      }
+    },
+    {
+      "id": "mkfza9yb",
+      "name": "2026 Movie Fantasy Draft",
+      "creatorId": "mkfz9ru5",
+      "code": "HQ5NFJ",
+      "members": [
+        "mkfz9ru5"
+      ],
+      "createdAt": "2026-01-15T21:45:15.491Z",
+      "settings": {
+        "seasonLength": 10,
+        "submissionsPerUser": 2,
+        "categories": [
+          "fan-favorite",
+          "wild-card"
+        ]
+      },
+      "season": {
+        "number": 1,
+        "startDate": "2026-01-15T21:45:19.687Z",
+        "currentWeek": 1,
+        "endDate": null
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "id": "mkfxvl4o",
+      "userId": "mkfu8xlm",
+      "movieTitle": "San Andreas",
+      "rating": 3,
+      "review": "This movie was mid",
+      "groupId": "mkfxtyv3",
+      "createdAt": "2026-01-15T21:05:50.520Z"
+    },
+    {
+      "id": "mkfy24kl",
+      "userId": "mkfu8xlm",
+      "movieTitle": "The Godfather",
+      "rating": 5,
+      "review": "Loved this pick: The Godfather",
+      "groupId": "mkfxtyv3",
+      "createdAt": "2026-01-15T21:10:55.653Z"
+    },
+    {
+      "id": "mkfy24ko",
+      "userId": "mkfu8xlm",
+      "movieTitle": "Inside Out",
+      "rating": 5,
+      "review": "Loved this pick: Inside Out",
+      "groupId": "mkfxtyv3",
+      "createdAt": "2026-01-15T21:10:55.656Z"
+    }
+  ],
+  "watched": [
+    {
+      "id": "mkfpcoai_About Time_mkfpcod2",
+      "userId": "mkfpcoai",
+      "movieTitle": "About Time",
+      "groupId": "mkfpcod2",
+      "watchedAt": "2026-01-15T17:47:24.874Z"
+    }
+  ],
+  "season": {
+    "number": 1,
+    "startDate": "2026-01-15T19:09:06.878Z",
+    "currentWeek": 1,
+    "endDate": null
+  },
+  "userSubmissions": {
+    "season_1_mkfxtyv3_mkfu8xlm": [
+      {
+        "category": "wild-card",
+        "title": "Inside Out",
+        "submittedAt": "2026-01-15T21:10:55.639Z"
+      },
+      {
+        "category": "fan-favorite",
+        "title": "The Godfather",
+        "submittedAt": "2026-01-15T21:10:55.645Z"
+      }
+    ],
+    "season_1_mkfu8xlm": [
+      {
+        "category": "wild-card",
+        "title": "Finding Nemo",
+        "submittedAt": "2026-01-15T21:08:06.503Z"
+      }
+    ],
+    "season_1_mkfy63rz_mkfu8xlm": [
+      {
+        "category": "wild-card",
+        "title": "Marcel the Shell",
+        "submittedAt": "2026-01-15T21:14:37.440Z"
+      },
+      {
+        "category": "fan-favorite",
+        "title": "The Notebook",
+        "submittedAt": "2026-01-15T21:14:52.730Z"
+      }
+    ]
+  },
+  "submissionArchive": [
+    {
+      "id": "mkfy24k7",
+      "title": "Inside Out",
+      "titleKey": "inside out",
+      "groupId": "mkfxtyv3",
+      "seasonNumber": 1,
+      "submittedAt": "2026-01-15T21:10:55.639Z"
+    },
+    {
+      "id": "mkfy24kd",
+      "title": "The Godfather",
+      "titleKey": "the godfather",
+      "groupId": "mkfxtyv3",
+      "seasonNumber": 1,
+      "submittedAt": "2026-01-15T21:10:55.645Z"
+    },
+    {
+      "id": "mkfy6vpc",
+      "title": "Marcel the Shell",
+      "titleKey": "marcel the shell",
+      "groupId": "mkfy63rz",
+      "seasonNumber": 1,
+      "submittedAt": "2026-01-15T21:14:37.440Z"
+    },
+    {
+      "id": "mkfy77i2",
+      "title": "The Notebook",
+      "titleKey": "the notebook",
+      "groupId": "mkfy63rz",
+      "seasonNumber": 1,
+      "submittedAt": "2026-01-15T21:14:52.730Z"
+    }
+  ]
+}
