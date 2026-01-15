@@ -104,10 +104,11 @@ header {
   color: white;
   padding: 4rem 2rem;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   border-bottom: 1px solid var(--border-color);
   box-shadow: var(--shadow-md);
   animation: slideDown 0.8s ease-out;
+  z-index: 100;
 }
 
 header::before {
@@ -136,16 +137,17 @@ header::after {
   position: absolute;
   top: 1.5rem;
   right: 2rem;
-  z-index: 100;
+  z-index: 1001;
 }
 
 .menu-container-fixed {
   position: fixed;
+  z-index: 1001;
 }
 
 .menu-dropdown {
   position: relative;
-  z-index: 100;
+  z-index: 1001;
 }
 
 .menu-toggle {
@@ -169,7 +171,7 @@ header::after {
   gap: 0.25rem;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  z-index: 100;
+  z-index: 1001;
 }
 
 .menu-panel.hidden {
@@ -248,7 +250,7 @@ header::after {
 
 .header-content {
   position: relative;
-  z-index: 1;
+  z-index: 100;
   max-width: 1200px;
   margin: 0 auto;
 }
