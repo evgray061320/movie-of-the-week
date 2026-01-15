@@ -107,7 +107,7 @@ app.post('/submit', async (req, res) => {
           currentWeek: 1,
           endDate: null
         };
-        save(db);
+        await data.updateGroup(groupId, { season: group.season });
       }
       
       const seasonNumber = group.season.number;
@@ -299,7 +299,7 @@ async function pickWinnersByCategory({ groupId = null } = {}) {
     }
 
     const winner = eligible[Math.floor(Math.random() * eligible.length)];
-    const submitter = db.users.find(u => u.id === winner.userId);
+    const submitter = await data.getUserById(winner.userId);
     const winnerClone = Object.assign({}, winner, {
       submittedBy: submitter?.name || submitter?.username || 'Unknown'
     });
@@ -607,475 +607,592 @@ app.post('/join-group', async (req, res) => {
   }
 });
 
-app.put('/group/:id/settings', (req, res) => {
+app.put('/group/:id/settings', async (req, res) => {
   const { id } = req.params;
   const { name, seasonLength, submissionsPerUser, categories, userId } = req.body || {};
-  const group = db.groups.find(g => g.id === id);
-  if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
+  try {
+    const group = await data.getGroupById(id);
+    if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
 
-  const admins = group.admins || [group.creatorId];
-  if (!userId || !admins.includes(userId)) {
-    return res.status(403).json({ ok: false, error: 'only the club admin can edit settings' });
+    const admins = group.admins || [group.creator_id];
+    if (!userId || !admins.includes(userId)) {
+      return res.status(403).json({ ok: false, error: 'only the club admin can edit settings' });
+    }
+
+    const trimmedName = String(name || '').trim();
+    const validSeasonLength = seasonLength && seasonLength >= 4 && seasonLength <= 52 ? seasonLength : null;
+    const validSubmissionsPerUser = submissionsPerUser && submissionsPerUser >= 1 && submissionsPerUser <= 20 ? submissionsPerUser : null;
+    const validCategories = Array.isArray(categories) && categories.length > 0 ? categories : null;
+
+    if (!trimmedName || !validSeasonLength || !validSubmissionsPerUser || !validCategories) {
+      return res.status(400).json({ ok: false, error: 'invalid settings' });
+    }
+
+    const updatedGroup = await data.updateGroup(id, {
+      name: trimmedName,
+      settings: {
+        seasonLength: validSeasonLength,
+        submissionsPerUser: validSubmissionsPerUser,
+        categories: validCategories
+      }
+    });
+    
+    const apiGroup = {
+      id: updatedGroup.id,
+      name: updatedGroup.name,
+      creatorId: updatedGroup.creator_id,
+      code: updatedGroup.code,
+      members: updatedGroup.members,
+      admins: updatedGroup.admins,
+      settings: updatedGroup.settings,
+      season: updatedGroup.season,
+      createdAt: updatedGroup.created_at
+    };
+    
+    res.json({ ok: true, group: apiGroup });
+  } catch (err) {
+    console.error('Update group settings error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to update group settings' });
   }
-
-  const trimmedName = String(name || '').trim();
-  const validSeasonLength = seasonLength && seasonLength >= 4 && seasonLength <= 52 ? seasonLength : null;
-  const validSubmissionsPerUser = submissionsPerUser && submissionsPerUser >= 1 && submissionsPerUser <= 20 ? submissionsPerUser : null;
-  const validCategories = Array.isArray(categories) && categories.length > 0 ? categories : null;
-
-  if (!trimmedName || !validSeasonLength || !validSubmissionsPerUser || !validCategories) {
-    return res.status(400).json({ ok: false, error: 'invalid settings' });
-  }
-
-  group.name = trimmedName;
-  group.settings = {
-    seasonLength: validSeasonLength,
-    submissionsPerUser: validSubmissionsPerUser,
-    categories: validCategories
-  };
-  save(db);
-  res.json({ ok: true, group });
 });
 
-app.post('/group/:id/season/start', (req, res) => {
+app.post('/group/:id/season/start', async (req, res) => {
   const { id } = req.params;
   const { userId } = req.body || {};
-  const group = db.groups.find(g => g.id === id);
-  if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
+  try {
+    const group = await data.getGroupById(id);
+    if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
 
-  const admins = group.admins || [group.creatorId];
-  if (!userId || !admins.includes(userId)) {
-    return res.status(403).json({ ok: false, error: 'only admins can start a new season' });
-  }
+    const admins = group.admins || [group.creator_id];
+    if (!userId || !admins.includes(userId)) {
+      return res.status(403).json({ ok: false, error: 'only admins can start a new season' });
+    }
 
-  if (!group.season) {
-    group.season = {
-      number: 1,
+    if (!group.season) {
+      group.season = {
+        number: 1,
+        startDate: new Date().toISOString(),
+        currentWeek: 1,
+        endDate: null
+      };
+    }
+
+    const groupSeasonLength = group.settings?.seasonLength || SEASON_WEEKS;
+    const startDate = new Date(group.season.startDate);
+    const now = new Date();
+    const weeksSinceStart = Math.floor((now - startDate) / WEEK_MS);
+    const rawWeek = weeksSinceStart + 1;
+    const hasEnded = rawWeek > groupSeasonLength || Boolean(group.season.endDate);
+
+    if (!hasEnded) {
+      return res.status(400).json({ ok: false, error: 'current season is still active' });
+    }
+
+    if (!group.seasons) group.seasons = [];
+    if (!group.season.endDate) {
+      group.season.endDate = new Date().toISOString();
+    }
+    group.seasons.push({ ...group.season });
+
+    const newSeason = {
+      number: (group.season.number || 1) + 1,
       startDate: new Date().toISOString(),
       currentWeek: 1,
       endDate: null
     };
-  }
 
-  const groupSeasonLength = group.settings?.seasonLength || SEASON_WEEKS;
-  const startDate = new Date(group.season.startDate);
-  const now = new Date();
-  const weeksSinceStart = Math.floor((now - startDate) / WEEK_MS);
-  const rawWeek = weeksSinceStart + 1;
-  const hasEnded = rawWeek > groupSeasonLength || Boolean(group.season.endDate);
+    // Clear submissions for this group
+    await data.deleteSubmissions({ groupId: id });
 
-  if (!hasEnded) {
-    return res.status(400).json({ ok: false, error: 'current season is still active' });
-  }
+    // Clear group user submission tracking
+    await data.deleteUserSubmissionsByGroup(id);
 
-  if (!group.seasons) group.seasons = [];
-  if (!group.season.endDate) {
-    group.season.endDate = new Date().toISOString();
-  }
-  group.seasons.push({ ...group.season });
-
-  group.season = {
-    number: (group.season.number || 1) + 1,
-    startDate: new Date().toISOString(),
-    currentWeek: 1,
-    endDate: null
-  };
-
-  // Clear submissions for this group
-  db.submissions = db.submissions.filter(s => s.groupId !== id);
-
-  // Clear group user submission tracking
-  if (db.userSubmissions) {
-    Object.keys(db.userSubmissions).forEach((key) => {
-      if (key.includes(`_${id}_`)) {
-        delete db.userSubmissions[key];
-      }
+    // Update group with new season
+    await data.updateGroup(id, {
+      seasons: group.seasons,
+      season: newSeason
     });
+
+    res.json({ ok: true, season: newSeason });
+  } catch (err) {
+    console.error('Start season error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to start new season' });
   }
-
-  save(db);
-  res.json({ ok: true, season: group.season });
 });
 
-app.get('/group/:id', (req, res) => {
-  const group = db.groups.find(g => g.id === req.params.id);
-  if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
-  // Populate members details
-  const members = group.members.map(id => db.users.find(u => u.id === id)).filter(u => u);
-  res.json({ ...group, memberDetails: members, admins: group.admins || [group.creatorId] });
+app.get('/group/:id', async (req, res) => {
+  try {
+    const group = await data.getGroupById(req.params.id);
+    if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
+    
+    // Populate members details
+    const memberPromises = (group.members || []).map(id => data.getUserById(id));
+    const members = (await Promise.all(memberPromises)).filter(u => u);
+    
+    const apiGroup = {
+      id: group.id,
+      name: group.name,
+      creatorId: group.creator_id,
+      code: group.code,
+      members: group.members,
+      admins: group.admins || [group.creator_id],
+      settings: group.settings,
+      season: group.season,
+      seasons: group.seasons,
+      createdAt: group.created_at,
+      memberDetails: members.map(user => ({
+        id: user.id,
+        username: user.username,
+        name: user.name,
+        genres: user.genres,
+        createdAt: user.created_at
+      }))
+    };
+    
+    res.json(apiGroup);
+  } catch (err) {
+    console.error('Get group error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to get group' });
+  }
 });
 
-app.post('/group/:id/admins', (req, res) => {
+app.post('/group/:id/admins', async (req, res) => {
   const { id } = req.params;
   const { userId, adminId } = req.body || {};
-  const group = db.groups.find(g => g.id === id);
-  if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
+  try {
+    const group = await data.getGroupById(id);
+    if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
 
-  const admins = group.admins || [group.creatorId];
-  if (!userId || !admins.includes(userId)) {
-    return res.status(403).json({ ok: false, error: 'only admins can add admins' });
+    const admins = group.admins || [group.creator_id];
+    if (!userId || !admins.includes(userId)) {
+      return res.status(403).json({ ok: false, error: 'only admins can add admins' });
+    }
+    if (!adminId) {
+      return res.status(400).json({ ok: false, error: 'missing adminId' });
+    }
+    if (!group.members.includes(adminId)) {
+      return res.status(400).json({ ok: false, error: 'user must be a member of the club' });
+    }
+    if (!admins.includes(adminId)) {
+      admins.push(adminId);
+    }
+    
+    await data.updateGroup(id, { admins });
+    res.json({ ok: true, admins });
+  } catch (err) {
+    console.error('Add admin error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to add admin' });
   }
-  if (!adminId) {
-    return res.status(400).json({ ok: false, error: 'missing adminId' });
-  }
-  if (!group.members.includes(adminId)) {
-    return res.status(400).json({ ok: false, error: 'user must be a member of the club' });
-  }
-  if (!admins.includes(adminId)) {
-    admins.push(adminId);
-  }
-  group.admins = admins;
-  save(db);
-  res.json({ ok: true, admins });
 });
 
-app.post('/group/:id/delete', (req, res) => {
+app.post('/group/:id/delete', async (req, res) => {
   const { id } = req.params;
   const { userId } = req.body || {};
-  const group = db.groups.find(g => g.id === id);
-  if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
+  try {
+    const group = await data.getGroupById(id);
+    if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
 
-  const admins = group.admins || [group.creatorId];
-  if (!userId || !admins.includes(userId)) {
-    return res.status(403).json({ ok: false, error: 'only admins can delete the club' });
-  }
-
-  // Remove group
-  db.groups = db.groups.filter(g => g.id !== id);
-
-  // Clear group membership on users
-  db.users.forEach(user => {
-    if (user.groupId === id) {
-      user.groupId = null;
+    const admins = group.admins || [group.creator_id];
+    if (!userId || !admins.includes(userId)) {
+      return res.status(403).json({ ok: false, error: 'only admins can delete the club' });
     }
-  });
 
-  // Remove group submissions and history
-  db.submissions = db.submissions.filter(s => s.groupId !== id);
-  db.history = db.history.filter(h => h.winner?.groupId !== id);
+    // Remove group (deleted via data.deleteGroup below)
+
+    // Clear group membership on users
+    const allUsers = await data.users();
+    for (const user of allUsers) {
+      if (user.group_id === id) {
+        await data.updateUser(user.id, { groupId: null });
+      }
+    }
+
+    // Remove group submissions and history
+    await data.deleteSubmissions({ groupId: id });
+    await data.deleteHistory({ groupId: id });
 
   // Remove group reviews and watched entries
   db.reviews = db.reviews.filter(r => r.groupId !== id);
   db.watched = db.watched.filter(w => w.groupId !== id);
 
-  // Remove group user submission tracking
-  if (db.userSubmissions) {
-    Object.keys(db.userSubmissions).forEach((key) => {
-      if (key.includes(`_${id}_`)) {
-        delete db.userSubmissions[key];
-      }
-    });
+    // Remove group user submission tracking
+    await data.deleteUserSubmissionsByGroup(id);
+    
+    // Delete the group
+    await data.deleteGroup(id);
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Delete group error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to delete group' });
   }
-
-  save(db);
-  res.json({ ok: true });
+  } catch (err) {
+    console.error('Delete group error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to delete group' });
+  }
 });
 
-app.post('/reset', (req, res) => {
-  db.submissions = [];
-  db.userSubmissions = {};
-  save(db);
-  res.json({ ok: true, message: 'All submissions cleared' });
+app.post('/reset', async (req, res) => {
+  try {
+    await data.deleteSubmissions();
+    // Note: user_submissions are tracked per season, so we don't need to clear all
+    res.json({ ok: true, message: 'All submissions cleared' });
+  } catch (err) {
+    console.error('Reset error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to reset submissions' });
+  }
 });
 
-app.post('/group/:id/reset-user', (req, res) => {
+app.post('/group/:id/reset-user', async (req, res) => {
   const { id } = req.params;
   const { userId, targetUserId } = req.body || {};
-  const group = db.groups.find(g => g.id === id);
-  if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
+  try {
+    const group = await data.getGroupById(id);
+    if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
 
-  const admins = group.admins || [group.creatorId];
-  if (!userId || !admins.includes(userId)) {
-    return res.status(403).json({ ok: false, error: 'only admins can reset user submissions' });
+    const admins = group.admins || [group.creator_id];
+    if (!userId || !admins.includes(userId)) {
+      return res.status(403).json({ ok: false, error: 'only admins can reset user submissions' });
+    }
+    if (!targetUserId) {
+      return res.status(400).json({ ok: false, error: 'missing targetUserId' });
+    }
+    const seasonNumber = group?.season?.number || 1;
+    const seasonKey = `season_${seasonNumber}_${id}_${targetUserId}`;
+    await data.setUserSubmissions(seasonKey, []);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Reset user error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to reset user submissions' });
   }
-  if (!targetUserId) {
-    return res.status(400).json({ ok: false, error: 'missing targetUserId' });
-  }
-  if (!db.userSubmissions) db.userSubmissions = {};
-  const seasonNumber = group?.season?.number || 1;
-  const seasonKey = `season_${seasonNumber}_${id}_${targetUserId}`;
-  db.userSubmissions[seasonKey] = [];
-  save(db);
-  res.json({ ok: true });
 });
 
 // ===== REVIEWS & WATCHED STATUS =====
-app.post('/mark-watched', (req, res) => {
+app.post('/mark-watched', async (req, res) => {
   const { userId, movieTitle, groupId } = req.body || {};
   if (!userId || !movieTitle) return res.status(400).json({ ok: false, error: 'missing userId or movieTitle' });
   
-  const watchedId = `${userId}_${movieTitle}_${groupId || 'global'}`;
-  const existing = db.watched.find(w => w.id === watchedId);
-  
-  if (existing) {
-    // Already marked as watched
-    res.json({ ok: true, watched: existing });
-  } else {
-    const watched = {
-      id: watchedId,
-      userId,
-      movieTitle,
-      groupId: groupId || null,
-      watchedAt: new Date().toISOString()
-    };
-    db.watched.push(watched);
-    save(db);
-    res.json({ ok: true, watched });
+  try {
+    const watchedId = `${userId}_${movieTitle}_${groupId || 'global'}`;
+    const existingWatched = await data.watched({ userId });
+    const existing = existingWatched.find(w => w.id === watchedId);
+    
+    if (existing) {
+      // Already marked as watched
+      res.json({ ok: true, watched: existing });
+    } else {
+      const watched = {
+        id: watchedId,
+        userId,
+        movieTitle,
+        groupId: groupId || null,
+        watchedAt: new Date().toISOString()
+      };
+      await data.createWatched(watched);
+      res.json({ ok: true, watched });
+    }
+  } catch (err) {
+    console.error('Mark watched error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to mark as watched' });
   }
 });
 
-app.get('/watched/:userId', (req, res) => {
+app.get('/watched/:userId', async (req, res) => {
   const { userId } = req.params;
   const { groupId } = req.query;
-  let watched = db.watched.filter(w => w.userId === userId);
-  if (groupId) {
-    watched = watched.filter(w => !w.groupId || w.groupId === groupId);
+  try {
+    let watched = await data.watched({ userId });
+    if (groupId) {
+      watched = watched.filter(w => !w.groupId || w.groupId === groupId);
+    }
+    res.json(watched);
+  } catch (err) {
+    console.error('Get watched error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to get watched movies' });
   }
-  res.json(watched);
 });
 
-app.post('/review', (req, res) => {
+app.post('/review', async (req, res) => {
   const { userId, movieTitle, rating, review, groupId } = req.body || {};
   if (!userId || !movieTitle || !review) {
     return res.status(400).json({ ok: false, error: 'missing required fields (userId, movieTitle, review)' });
   }
   
-  const reviewId = Date.now().toString(36);
-  const reviewObj = {
-    id: reviewId,
-    userId,
-    movieTitle,
-    rating: rating || null,
-    review: review.trim(),
-    groupId: groupId || null,
-    createdAt: new Date().toISOString()
-  };
-  
-  db.reviews.push(reviewObj);
-  save(db);
-  
-  // Get user info for the response
-  const user = db.users.find(u => u.id === userId);
-  res.json({ ok: true, review: { ...reviewObj, userName: user?.name || 'Unknown' } });
+  try {
+    const reviewId = Date.now().toString(36);
+    const reviewObj = await data.createReview({
+      id: reviewId,
+      userId,
+      movieTitle,
+      rating: rating || null,
+      review: review.trim(),
+      groupId: groupId || null,
+      createdAt: new Date().toISOString()
+    });
+    
+    // Get user info for the response
+    const user = await data.getUserById(userId);
+    res.json({ ok: true, review: { ...reviewObj, userName: user?.name || user?.username || 'Unknown' } });
+  } catch (err) {
+    console.error('Create review error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to create review' });
+  }
 });
 
-app.get('/reviews', (req, res) => {
+app.get('/reviews', async (req, res) => {
   const { movieTitle, groupId } = req.query;
-  let reviews = db.reviews;
-  
-  if (movieTitle) {
-    reviews = reviews.filter(r => r.movieTitle === movieTitle);
+  try {
+    let reviews = await data.reviews({ movieTitle, groupId });
+    
+    // Sort by newest first
+    reviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
+    // Populate user names
+    const userPromises = reviews.map(r => data.getUserById(r.userId));
+    const users = await Promise.all(userPromises);
+    const reviewsWithUsers = reviews.map((r, i) => ({
+      ...r,
+      userName: users[i]?.name || users[i]?.username || 'Unknown'
+    }));
+    
+    res.json(reviewsWithUsers);
+  } catch (err) {
+    console.error('Get reviews error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to get reviews' });
   }
-  if (groupId) {
-    reviews = reviews.filter(r => !r.groupId || r.groupId === groupId);
-  }
-  
-  // Sort by newest first
-  reviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  
-  // Populate user names
-  const reviewsWithUsers = reviews.map(r => {
-    const user = db.users.find(u => u.id === r.userId);
-    return { ...r, userName: user?.name || 'Unknown' };
-  });
-  
-  res.json(reviewsWithUsers);
 });
 
-app.get('/reviews/weekly', (req, res) => {
-  // Get reviews for the current week's winner
-  const latestWinner = db.history[0];
-  if (!latestWinner || !latestWinner.winner) {
-    return res.json([]);
+app.get('/reviews/weekly', async (req, res) => {
+  try {
+    // Get reviews for the current week's winner
+    const history = await data.history();
+    const latestWinner = history[0];
+    if (!latestWinner || !latestWinner.winner) {
+      return res.json([]);
+    }
+    
+    const movieTitle = latestWinner.winner.title;
+    const { groupId } = req.query;
+    
+    let reviews = await data.reviews({ movieTitle, groupId });
+    
+    reviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
+    // Populate user names
+    const userPromises = reviews.map(r => data.getUserById(r.userId));
+    const users = await Promise.all(userPromises);
+    const reviewsWithUsers = reviews.map((r, i) => ({
+      ...r,
+      userName: users[i]?.name || users[i]?.username || 'Unknown'
+    }));
+    
+    res.json(reviewsWithUsers);
+  } catch (err) {
+    console.error('Get weekly reviews error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to get weekly reviews' });
   }
-  
-  const movieTitle = latestWinner.winner.title;
-  const { groupId } = req.query;
-  
-  let reviews = db.reviews.filter(r => r.movieTitle === movieTitle);
-  if (groupId) {
-    reviews = reviews.filter(r => !r.groupId || r.groupId === groupId);
-  }
-  
-  reviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  
-  const reviewsWithUsers = reviews.map(r => {
-    const user = db.users.find(u => u.id === r.userId);
-    return { ...r, userName: user?.name || 'Unknown' };
-  });
-  
-  res.json(reviewsWithUsers);
 });
 
 // Schedule weekly picks. For dev/testing you can set PICK_INTERVAL_MS to a smaller value.
 const PICK_INTERVAL_MS = process.env.PICK_INTERVAL_MS ? Number(process.env.PICK_INTERVAL_MS) : 7 * 24 * 60 * 60 * 1000;
-setInterval(() => {
+setInterval(async () => {
   console.log('Running scheduled weekly pick...');
-  pickWinnersByCategory();
+  try {
+    await pickWinnersByCategory();
+  } catch (err) {
+    console.error('Scheduled pick error:', err);
+  }
 }, PICK_INTERVAL_MS);
 
 // Season status endpoint - supports groupId parameter for per-group seasons
-app.get('/season', (req, res) => {
+app.get('/season', async (req, res) => {
   const { groupId } = req.query;
   
-  // If groupId is provided, use group-specific season settings
-  if (groupId) {
-    const group = db.groups.find(g => g.id === groupId);
-    if (group && group.settings) {
-      // Initialize group season if it doesn't exist
-      if (!group.season) {
-        group.season = {
-          number: 1,
-          startDate: new Date().toISOString(),
-          currentWeek: 1,
-          endDate: null
-        };
-        save(db);
+  try {
+    // If groupId is provided, use group-specific season settings
+    if (groupId) {
+      const group = await data.getGroupById(groupId);
+      if (group && group.settings) {
+        // Initialize group season if it doesn't exist
+        if (!group.season) {
+          const newSeason = {
+            number: 1,
+            startDate: new Date().toISOString(),
+            currentWeek: 1,
+            endDate: null
+          };
+          await data.updateGroup(groupId, { season: newSeason });
+          group.season = newSeason;
+        }
+        
+        const groupSeasonLength = group.settings.seasonLength || SEASON_WEEKS;
+        const startDate = new Date(group.season.startDate);
+        const now = new Date();
+        const weeksSinceStart = Math.floor((now - startDate) / WEEK_MS);
+        const rawWeek = weeksSinceStart + 1;
+        const currentWeek = Math.min(rawWeek, groupSeasonLength);
+        const hasEnded = rawWeek > groupSeasonLength || Boolean(group.season.endDate);
+        
+        // Update current week
+        const updatedSeason = { ...group.season, currentWeek };
+        
+        // Mark season ended but do not auto-start a new one
+        if (rawWeek > groupSeasonLength && !group.season.endDate) {
+          updatedSeason.endDate = new Date().toISOString();
+          const seasons = group.seasons || [];
+          seasons.push({ ...updatedSeason });
+          await data.updateGroup(groupId, { season: updatedSeason, seasons });
+        } else {
+          await data.updateGroup(groupId, { season: updatedSeason });
+        }
+        
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + (groupSeasonLength * 7));
+        
+        return res.json({
+          seasonNumber: updatedSeason.number,
+          currentWeek,
+          totalWeeks: groupSeasonLength,
+          startDate: updatedSeason.startDate,
+          endDate: endDate.toISOString(),
+          weeksRemaining: Math.max(0, groupSeasonLength - currentWeek),
+          isActive: !hasEnded
+        });
       }
-      
-      const groupSeasonLength = group.settings.seasonLength || SEASON_WEEKS;
-      const startDate = new Date(group.season.startDate);
-      const now = new Date();
-      const weeksSinceStart = Math.floor((now - startDate) / WEEK_MS);
-      const rawWeek = weeksSinceStart + 1;
-      const currentWeek = Math.min(rawWeek, groupSeasonLength);
-      const hasEnded = rawWeek > groupSeasonLength || Boolean(group.season.endDate);
-      
-      // Update current week
-      group.season.currentWeek = currentWeek;
-      
-      // Mark season ended but do not auto-start a new one
-      if (rawWeek > groupSeasonLength && !group.season.endDate) {
-        group.season.endDate = new Date().toISOString();
-        if (!group.seasons) group.seasons = [];
-        group.seasons.push({ ...group.season });
-        save(db);
-      }
-      
-      const endDate = new Date(startDate);
-      endDate.setDate(endDate.getDate() + (groupSeasonLength * 7));
-      
-      return res.json({
-        seasonNumber: group.season.number,
-        currentWeek,
-        totalWeeks: groupSeasonLength,
-        startDate: group.season.startDate,
-        endDate: endDate.toISOString(),
-        weeksRemaining: Math.max(0, groupSeasonLength - currentWeek),
-        isActive: !hasEnded
-      });
     }
+    
+    // Default global season (for backwards compatibility)
+    await checkAndResetSeason();
+    const globalSeason = await data.getGlobalSeason();
+    const currentWeek = await getCurrentWeek();
+    await data.updateGlobalSeason({ currentWeek });
+    
+    const startDate = new Date(globalSeason.startDate);
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + (SEASON_WEEKS * 7));
+    
+    res.json({
+      seasonNumber: globalSeason.number,
+      currentWeek,
+      totalWeeks: SEASON_WEEKS,
+      startDate: globalSeason.startDate,
+      endDate: endDate.toISOString(),
+      weeksRemaining: Math.max(0, SEASON_WEEKS - currentWeek),
+      isActive: currentWeek <= SEASON_WEEKS
+    });
+  } catch (err) {
+    console.error('Get season error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to get season info' });
   }
-  
-  // Default global season (for backwards compatibility)
-  checkAndResetSeason();
-  const currentWeek = getCurrentWeek();
-  db.season.currentWeek = currentWeek;
-  save(db);
-  
-  const startDate = new Date(db.season.startDate);
-  const endDate = new Date(startDate);
-  endDate.setDate(endDate.getDate() + (SEASON_WEEKS * 7));
-  
-  res.json({
-    seasonNumber: db.season.number,
-    currentWeek,
-    totalWeeks: SEASON_WEEKS,
-    startDate: db.season.startDate,
-    endDate: endDate.toISOString(),
-    weeksRemaining: Math.max(0, SEASON_WEEKS - currentWeek),
-    isActive: currentWeek <= SEASON_WEEKS
-  });
 });
 
 // Check if user has submitted for current season
-app.get('/season/user-status/:userId', (req, res) => {
+app.get('/season/user-status/:userId', async (req, res) => {
   const { userId } = req.params;
   const { groupId } = req.query;
-  checkAndResetSeason();
-  
-  if (!db.userSubmissions) db.userSubmissions = {};
-  let seasonKey = `season_${db.season.number}_${userId}`;
-  if (groupId) {
-    const group = db.groups.find(g => g.id === groupId);
-    const seasonNumber = group?.season?.number || 1;
-    seasonKey = `season_${seasonNumber}_${groupId}_${userId}`;
+  try {
+    await checkAndResetSeason();
+    
+    let seasonKey;
+    if (groupId) {
+      const group = await data.getGroupById(groupId);
+      const seasonNumber = group?.season?.number || 1;
+      seasonKey = `season_${seasonNumber}_${groupId}_${userId}`;
+    } else {
+      const globalSeason = await data.getGlobalSeason();
+      seasonKey = `season_${globalSeason.number}_${userId}`;
+    }
+    
+    const userSubmissions = await data.getUserSubmissions(seasonKey);
+    
+    const hasTopPick = userSubmissions.some(s => s.category === 'top-pick');
+    const hasWildCard = userSubmissions.some(s => s.category === 'wild-card');
+    
+    res.json({
+      hasSubmissions: userSubmissions.length > 0,
+      hasTopPick,
+      hasWildCard,
+      submissions: userSubmissions
+    });
+  } catch (err) {
+    console.error('Get user status error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to get user status' });
   }
-  const userSubmissions = db.userSubmissions[seasonKey] || [];
-  
-  const hasTopPick = userSubmissions.some(s => s.category === 'top-pick');
-  const hasWildCard = userSubmissions.some(s => s.category === 'wild-card');
-  
-  res.json({
-    hasSubmissions: userSubmissions.length > 0,
-    hasTopPick,
-    hasWildCard,
-    submissions: userSubmissions
-  });
 });
 
 // Get submission summary by user for admin view
-app.get('/group/:id/submissions-summary', (req, res) => {
+app.get('/group/:id/submissions-summary', async (req, res) => {
   const { id } = req.params;
   const { userId } = req.query; // Admin userId for authorization
-  const group = db.groups.find(g => g.id === id);
-  if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
+  try {
+    const group = await data.getGroupById(id);
+    if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
 
-  const admins = group.admins || [group.creatorId];
-  if (!userId || !admins.includes(userId)) {
-    return res.status(403).json({ ok: false, error: 'only admins can view submission summary' });
-  }
+    const admins = group.admins || [group.creator_id];
+    if (!userId || !admins.includes(userId)) {
+      return res.status(403).json({ ok: false, error: 'only admins can view submission summary' });
+    }
 
-  const seasonNumber = group?.season?.number || 1;
-  const members = group.members || [];
-  
-  // Get all submissions for this group and season
-  const groupSubmissions = db.submissions.filter(s => 
-    s.groupId === id && s.seasonNumber === seasonNumber
-  );
-
-  // Group submissions by user
-  const userSummaries = members.map(memberId => {
-    const user = db.users.find(u => u.id === memberId);
-    const userSubs = groupSubmissions.filter(s => s.userId === memberId);
+    const seasonNumber = group?.season?.number || 1;
+    const members = group.members || [];
     
-    // Organize by category
-    const byCategory = {};
-    userSubs.forEach(sub => {
-      if (!byCategory[sub.category]) {
-        byCategory[sub.category] = [];
-      }
-      byCategory[sub.category].push({
-        title: sub.title,
-        description: sub.description,
-        posterUrl: sub.posterUrl,
-        submittedAt: sub.submittedAt
+    // Get all submissions for this group and season
+    const groupSubmissions = await data.submissions({ groupId: id, seasonNumber });
+
+    // Group submissions by user
+    const userPromises = members.map(memberId => data.getUserById(memberId));
+    const users = await Promise.all(userPromises);
+    
+    const userSummaries = members.map((memberId, index) => {
+      const user = users[index];
+      const userSubs = groupSubmissions.filter(s => s.userId === memberId);
+      
+      // Organize by category
+      const byCategory = {};
+      userSubs.forEach(sub => {
+        if (!byCategory[sub.category]) {
+          byCategory[sub.category] = [];
+        }
+        byCategory[sub.category].push({
+          title: sub.title,
+          description: sub.description,
+          posterUrl: sub.posterUrl,
+          submittedAt: sub.submittedAt
+        });
       });
+
+      return {
+        userId: memberId,
+        username: user?.username || user?.name || 'Unknown',
+        isAdmin: admins.includes(memberId),
+        submissionCount: userSubs.length,
+        submissionsByCategory: byCategory,
+        categories: Object.keys(byCategory)
+      };
     });
 
-    return {
-      userId: memberId,
-      username: user?.username || user?.name || 'Unknown',
-      isAdmin: admins.includes(memberId),
-      submissionCount: userSubs.length,
-      submissionsByCategory: byCategory,
-      categories: Object.keys(byCategory)
-    };
-  });
+    // Sort by submission count (descending), then by username
+    userSummaries.sort((a, b) => {
+      if (b.submissionCount !== a.submissionCount) {
+        return b.submissionCount - a.submissionCount;
+      }
+      return (a.username || '').localeCompare(b.username || '');
+    });
 
-  // Sort by submission count (descending), then by username
-  userSummaries.sort((a, b) => {
-    if (b.submissionCount !== a.submissionCount) {
-      return b.submissionCount - a.submissionCount;
-    }
-    return (a.username || '').localeCompare(b.username || '');
-  });
-
-  res.json({ ok: true, summaries: userSummaries, totalSubmissions: groupSubmissions.length });
+    res.json({ ok: true, summaries: userSummaries, totalSubmissions: groupSubmissions.length });
+  } catch (err) {
+    console.error('Get submissions summary error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to get submissions summary' });
+  }
 });
 
 const HOST = process.env.HOST || '0.0.0.0';
-app.listen(PORT, HOST, () => {
+app.listen(PORT, HOST, async () => {
   console.log(`Server listening on ${HOST}:${PORT}`);
-  console.log(`Current season: ${db.season.number}, Week: ${db.season.currentWeek}/${SEASON_WEEKS}`);
+  try {
+    const globalSeason = await data.getGlobalSeason();
+    console.log(`Current season: ${globalSeason.number}, Week: ${globalSeason.currentWeek}/${SEASON_WEEKS}`);
+  } catch (err) {
+    console.log('Note: Could not load season info (this is normal on first start)');
+  }
 });

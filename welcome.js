@@ -172,7 +172,7 @@ async function loadMyClubs() {
       const roleLabel = club.isAdmin ? ' <span style="color: var(--gold);">(Admin)</span>' : '';
       const clubCard = document.createElement('div');
       clubCard.className = 'club-card';
-      clubCard.style.cssText = 'background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; margin-bottom: 1rem; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;';
+      clubCard.style.cssText = 'background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; margin-bottom: 1rem; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; touch-action: manipulation; -webkit-tap-highlight-color: rgba(212, 175, 55, 0.2); user-select: none;';
       clubCard.innerHTML = `
         <h3 style="margin: 0 0 1rem 0; color: var(--text-primary);">${escapeHtml(club.name || 'My Club')}${roleLabel}</h3>
         <p style="margin: 0.5rem 0; color: var(--text-secondary);">
@@ -186,7 +186,7 @@ async function loadMyClubs() {
         </button>
       `;
       
-      // Add hover effect
+      // Add hover effect (desktop only)
       clubCard.addEventListener('mouseenter', () => {
         if (!isCurrent) {
           clubCard.style.transform = 'translateY(-2px)';
@@ -199,19 +199,46 @@ async function loadMyClubs() {
       });
       
       // Add click handler to switch to this club and go to dashboard
-      const button = clubCard.querySelector('button');
-      if (button && !isCurrent) {
-        button.addEventListener('click', (e) => {
+      // Handle both click and touch events for mobile compatibility
+      if (!isCurrent) {
+        // Make button and card both clickable - use simple, reliable handlers
+        const handleSwitch = (e) => {
+          e.preventDefault();
           e.stopPropagation();
           switchToClub(club);
-        });
-      }
-      
-      // Also make the entire card clickable
-      if (!isCurrent) {
-        clubCard.addEventListener('click', () => {
+        };
+        
+        // Button handler
+        const button = clubCard.querySelector('button');
+        if (button) {
+          // Touch events for mobile
+          button.addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+          }, { passive: true });
+          
+          button.addEventListener('touchend', handleSwitch, { passive: false });
+          button.addEventListener('click', handleSwitch);
+        }
+        
+        // Card handler (for clicking anywhere on card, but not button)
+        const handleCardSwitch = (e) => {
+          // Skip if clicking directly on button
+          const buttonEl = clubCard.querySelector('button');
+          if (buttonEl && (e.target === buttonEl || buttonEl.contains(e.target))) {
+            return;
+          }
+          e.preventDefault();
+          e.stopPropagation();
           switchToClub(club);
-        });
+        };
+        
+        clubCard.addEventListener('touchstart', (e) => {
+          // Store touch target to check in touchend
+          clubCard.dataset.touchTarget = e.target === clubCard ? 'card' : (e.target.tagName || '');
+        }, { passive: true });
+        
+        clubCard.addEventListener('touchend', handleCardSwitch, { passive: false });
+        clubCard.addEventListener('click', handleCardSwitch);
       }
       
       listEl.appendChild(clubCard);
