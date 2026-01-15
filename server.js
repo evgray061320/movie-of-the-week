@@ -286,7 +286,8 @@ async function pickWinnersByCategory({ groupId = null } = {}) {
   const winners = [];
   const skippedCategories = [];
 
-  categories.forEach((category) => {
+  // Use for...of loop to handle async operations properly
+  for (const category of categories) {
     const eligible = relevantSubmissions.filter((submission) => {
       if (submission.category !== category) return false;
       const normalized = normalizeTitle(submission.title);
@@ -297,7 +298,7 @@ async function pickWinnersByCategory({ groupId = null } = {}) {
 
     if (!eligible.length) {
       skippedCategories.push(category);
-      return;
+      continue;
     }
 
     const winner = eligible[Math.floor(Math.random() * eligible.length)];
@@ -307,7 +308,7 @@ async function pickWinnersByCategory({ groupId = null } = {}) {
     });
     winners.push(winnerClone);
     chosenTitles.add(normalizeTitle(winner.title));
-  });
+  }
 
   if (!winners.length) return null;
 
@@ -824,10 +825,6 @@ app.post('/group/:id/delete', async (req, res) => {
     await data.deleteGroup(id);
 
     res.json({ ok: true });
-  } catch (err) {
-    console.error('Delete group error:', err);
-    res.status(500).json({ ok: false, error: 'Failed to delete group' });
-  }
   } catch (err) {
     console.error('Delete group error:', err);
     res.status(500).json({ ok: false, error: 'Failed to delete group' });
