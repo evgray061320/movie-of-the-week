@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="Sign in or sign up - CinemaClub">
+    <title>Sign In - CinemaClub</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%238b5cf6'/%3E%3Cstop offset='100%25' style='stop-color:%233b82f6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='100' height='100'/%3E%3Ctext x='50' y='65' font-size='60' font-weight='bold' text-anchor='middle' fill='%23fff'%3E🎬%3C/text%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .login-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 24px;
+            padding: 3rem;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            animation: slideUp 0.6s ease-out;
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .login-header h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            margin: 0 0 1rem 0;
+            background: linear-gradient(135deg, #ffffff 0%, #d4af37 50%, #c41e3a 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientMove 3s ease infinite;
+        }
+        .login-header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>🎬 CinemaClub</h1>
+                <p>Sign in or create an account to continue</p>
+            </div>
+            
+            <div class="setup-tabs" role="tablist" aria-label="Account access">
+                <button class="setup-tab-btn active" data-tab="signin" id="tab-signin" role="tab" aria-selected="true" aria-controls="signin-tab" tabindex="0">🔑 Sign In</button>
+                <button class="setup-tab-btn" data-tab="signup" id="tab-signup" role="tab" aria-selected="false" aria-controls="signup-tab" tabindex="-1">✨ Sign Up</button>
+            </div>
+
+            <!-- Sign In Tab -->
+            <div id="signin-tab" class="setup-tab-content active" role="tabpanel" aria-labelledby="tab-signin" aria-hidden="false" tabindex="0">
+                <form id="signin-form" class="group-form">
+                    <div class="form-group">
+                        <label for="signin-username" class="form-label">Username</label>
+                        <input type="text" id="signin-username" class="form-input" placeholder="Choose a username..." autocomplete="username" minlength="3" required>
+                        <span class="form-help">Use 3+ characters, letters or numbers.</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="signin-password" class="form-label">Password</label>
+                        <div class="input-with-toggle">
+                            <input type="password" id="signin-password" class="form-input" placeholder="Enter your password..." autocomplete="current-password" minlength="8" required>
+                            <button type="button" class="toggle-password" data-target="signin-password" aria-label="Show password" aria-pressed="false">👁️</button>
+                        </div>
+                        <span class="form-help">Use 8+ characters.</span>
+                    </div>
+                    <div class="form-inline">
+                        <label class="checkbox">
+                            <input type="checkbox" id="signin-remember" name="signin-remember" checked>
+                            Remember me
+                        </label>
+                        <button type="button" id="password-recovery-btn" class="btn btn-secondary btn-link">Forgot password?</button>
+                    </div>
+                    <button type="submit" class="btn btn-primary">🔑 Sign In</button>
+                    <div id="signin-status" class="form-status" role="status" aria-live="polite"></div>
+                </form>
+            </div>
+
+            <!-- Sign Up Tab -->
+            <div id="signup-tab" class="setup-tab-content" role="tabpanel" aria-labelledby="tab-signup" aria-hidden="true" tabindex="0">
+                <form id="signup-form" class="group-form">
+                    <div class="form-group">
+                        <label for="signup-username" class="form-label">Username</label>
+                        <input type="text" id="signup-username" class="form-input" placeholder="Choose a username..." autocomplete="username" minlength="3" required>
+                        <span class="form-help">Use 3+ characters, letters or numbers.</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password" class="form-label">Password</label>
+                        <div class="input-with-toggle">
+                            <input type="password" id="signup-password" class="form-input" placeholder="Create a password..." autocomplete="new-password" minlength="8" required>
+                            <button type="button" class="toggle-password" data-target="signup-password" aria-label="Show password" aria-pressed="false">👁️</button>
+                        </div>
+                        <span class="form-help">Use 8+ characters.</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password-confirm" class="form-label">Confirm Password</label>
+                        <div class="input-with-toggle">
+                            <input type="password" id="signup-password-confirm" class="form-input" placeholder="Re-enter your password..." autocomplete="new-password" minlength="8" required>
+                            <button type="button" class="toggle-password" data-target="signup-password-confirm" aria-label="Show password" aria-pressed="false">👁️</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-security-question" class="form-label">Security Question</label>
+                        <select id="signup-security-question" class="form-input" required>
+                            <option value="">Select a question...</option>
+                            <option value="pet">What was the name of your first pet?</option>
+                            <option value="school">What elementary school did you attend?</option>
+                            <option value="city">In what city were you born?</option>
+                            <option value="movie">What is your all-time favorite movie?</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-security-answer" class="form-label">Security Answer</label>
+                        <input type="text" id="signup-security-answer" class="form-input" placeholder="Your answer..." required>
+                        <span class="form-help">Answers are case-insensitive.</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Favorite Genres <span class="form-help optional">Optional</span></label>
+                        <div class="genre-list">
+                            <label class="checkbox"><input type="checkbox" name="signup-genre" value="Action"> Action</label>
+                            <label class="checkbox"><input type="checkbox" name="signup-genre" value="Comedy"> Comedy</label>
+                            <label class="checkbox"><input type="checkbox" name="signup-genre" value="Drama"> Drama</label>
+                            <label class="checkbox"><input type="checkbox" name="signup-genre" value="Horror"> Horror</label>
+                            <label class="checkbox"><input type="checkbox" name="signup-genre" value="Sci-Fi"> Sci-Fi</label>
+                            <label class="checkbox"><input type="checkbox" name="signup-genre" value="Thriller"> Thriller</label>
+                            <label class="checkbox"><input type="checkbox" name="signup-genre" value="Romance"> Romance</label>
+                            <label class="checkbox"><input type="checkbox" name="signup-genre" value="Fantasy"> Fantasy</label>
+                            <label class="checkbox"><input type="checkbox" name="signup-genre" value="Family Fun"> Family Fun</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">✨ Create Account</button>
+                    <div id="signup-status" class="form-status" role="status" aria-live="polite"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="recovery-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔐 Password Recovery</h2>
+                <button class="modal-close" id="close-recovery-modal">&times;</button>
+            </div>
+            <form id="recovery-form" class="group-form">
+                <div class="form-group">
+                    <label for="recovery-username" class="form-label">Username</label>
+                    <input type="text" id="recovery-username" class="form-input" placeholder="Enter your username..." autocomplete="username" minlength="3" required>
+                </div>
+                <div class="form-group">
+                    <label for="recovery-security-question" class="form-label">Security Question</label>
+                    <select id="recovery-security-question" class="form-input" required>
+                        <option value="">Select your question...</option>
+                        <option value="pet">What was the name of your first pet?</option>
+                        <option value="school">What elementary school did you attend?</option>
+                        <option value="city">In what city were you born?</option>
+                        <option value="movie">What is your all-time favorite movie?</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="recovery-security-answer" class="form-label">Security Answer</label>
+                    <input type="text" id="recovery-security-answer" class="form-input" placeholder="Your answer..." required>
+                    <span class="form-help">Answers are case-insensitive.</span>
+                </div>
+                <div class="form-group">
+                    <label for="recovery-password" class="form-label">New Password</label>
+                    <div class="input-with-toggle">
+                        <input type="password" id="recovery-password" class="form-input" placeholder="Create a new password..." autocomplete="new-password" minlength="8" required>
+                        <button type="button" class="toggle-password" data-target="recovery-password" aria-label="Show password" aria-pressed="false">👁️</button>
+                    </div>
+                    <span class="form-help">Use 8+ characters.</span>
+                </div>
+                <div class="form-group">
+                    <label for="recovery-password-confirm" class="form-label">Confirm New Password</label>
+                    <div class="input-with-toggle">
+                        <input type="password" id="recovery-password-confirm" class="form-input" placeholder="Re-enter your new password..." autocomplete="new-password" minlength="8" required>
+                        <button type="button" class="toggle-password" data-target="recovery-password-confirm" aria-label="Show password" aria-pressed="false">👁️</button>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Reset Password</button>
+                <div id="recovery-status" class="form-status" role="status" aria-live="polite"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>

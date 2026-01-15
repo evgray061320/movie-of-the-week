@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="Join or create a movie club - CinemaClub">
+    <title>Welcome to CinemaClub</title>
+    <meta http-equiv="refresh" content="0; url=login.html">
+    <script>
+        // Redirect to welcome page
+        window.location.href = 'login.html';
+    </script>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%238b5cf6'/%3E%3Cstop offset='100%25' style='stop-color:%233b82f6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='100' height='100'/%3E%3Ctext x='50' y='65' font-size='60' font-weight='bold' text-anchor='middle' fill='%23fff'%3E🎬%3C/text%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Group Setup Modal (Required) -->
+    <div id="group-setup-modal" class="modal group-setup-modal">
+        <div class="modal-content group-setup-content">
+            <div class="modal-header">
+                <h2>🎬 Join or Create a Movie Club</h2>
+            </div>
+            <p class="modal-subtitle">Get started by creating a new club or joining an existing one with your friends</p>
+            
+            <div class="setup-tabs">
+                <button class="setup-tab-btn active" data-tab="create">➕ Create New Club</button>
+                <button class="setup-tab-btn" data-tab="join">🔗 Join Existing Club</button>
+            </div>
+
+            <!-- Create Club Tab -->
+            <div id="create-tab" class="setup-tab-content active">
+                <form id="create-group-form" class="group-form">
+                    <div class="form-group">
+                        <label for="setup-name" class="form-label">Your Name</label>
+                        <input type="text" id="setup-name" class="form-input" placeholder="Enter your name..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="setup-email" class="form-label">Email</label>
+                        <input type="email" id="setup-email" class="form-input" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="setup-club-name" class="form-label">Club Name</label>
+                        <input type="text" id="setup-club-name" class="form-input" placeholder="e.g., My Awesome Movie Club" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Favorite Genres</label>
+                        <div class="genre-list">
+                            <label class="checkbox"><input type="checkbox" name="setup-genre" value="Action"> Action</label>
+                            <label class="checkbox"><input type="checkbox" name="setup-genre" value="Comedy"> Comedy</label>
+                            <label class="checkbox"><input type="checkbox" name="setup-genre" value="Drama"> Drama</label>
+                            <label class="checkbox"><input type="checkbox" name="setup-genre" value="Horror"> Horror</label>
+                            <label class="checkbox"><input type="checkbox" name="setup-genre" value="Sci-Fi"> Sci-Fi</label>
+                            <label class="checkbox"><input type="checkbox" name="setup-genre" value="Thriller"> Thriller</label>
+                            <label class="checkbox"><input type="checkbox" name="setup-genre" value="Romance"> Romance</label>
+                            <label class="checkbox"><input type="checkbox" name="setup-genre" value="Fantasy"> Fantasy</label>
+                            <label class="checkbox"><input type="checkbox" name="setup-genre" value="Family Fun"> Family Fun </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">✓ Create Club</button>
+                </form>
+                <div id="create-success" style="display: none;">
+                    <div class="success-box">
+                        <h3>✓ Club Created!</h3>
+                        <p class="code-display" id="club-code-display"></p>
+                        <p class="code-hint">Share this code with friends so they can join your club</p>
+                        <button id="start-club-btn" class="btn btn-primary">Start Using Club</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Join Club Tab -->
+            <div id="join-tab" class="setup-tab-content">
+                <form id="join-group-form" class="group-form">
+                    <div class="form-group">
+                        <label for="join-name" class="form-label">Your Name</label>
+                        <input type="text" id="join-name" class="form-input" placeholder="Enter your name..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="join-email" class="form-label">Email</label>
+                        <input type="email" id="join-email" class="form-input" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="join-club-code" class="form-label">Club Code</label>
+                        <input type="text" id="join-club-code" class="form-input" placeholder="e.g., ABC123" maxlength="6" required>
+                        <p class="form-hint">Ask your club admin for the club code</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Favorite Genres</label>
+                        <div class="genre-list">
+                            <label class="checkbox"><input type="checkbox" name="join-genre" value="Action"> Action</label>
+                            <label class="checkbox"><input type="checkbox" name="join-genre" value="Comedy"> Comedy</label>
+                            <label class="checkbox"><input type="checkbox" name="join-genre" value="Drama"> Drama</label>
+                            <label class="checkbox"><input type="checkbox" name="join-genre" value="Horror"> Horror</label>
+                            <label class="checkbox"><input type="checkbox" name="join-genre" value="Sci-Fi"> Sci-Fi</label>
+                            <label class="checkbox"><input type="checkbox" name="join-genre" value="Thriller"> Thriller</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">✓ Join Club</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profile-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>👤 Create Your Profile</h2>
+                <button class="modal-close" id="close-profile-modal">&times;</button>
+            </div>
+            <div id="profile-form-container">
+                <form id="profile-form" class="profile-form">
+                    <div class="form-group">
+                        <label for="profile-name" class="form-label">Your Name</label>
+                        <input type="text" id="profile-name" class="form-input" placeholder="Enter your name..." required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Favorite Genres (select all that apply)</label>
+                        <div class="genre-list">
+                            <label class="checkbox"><input type="checkbox" name="genre" value="Action"> Action</label>
+                            <label class="checkbox"><input type="checkbox" name="genre" value="Comedy"> Comedy</label>
+                            <label class="checkbox"><input type="checkbox" name="genre" value="Drama"> Drama</label>
+                            <label class="checkbox"><input type="checkbox" name="genre" value="Horror"> Horror</label>
+                            <label class="checkbox"><input type="checkbox" name="genre" value="Sci-Fi"> Sci-Fi</label>
+                            <label class="checkbox"><input type="checkbox" name="genre" value="Thriller"> Thriller</label>
+                        </div>
+                    </div>
+                    <div id="group-choice" class="form-group">
+                        <label class="form-label">Movie Club Group</label>
+                        <div class="group-buttons">
+                            <button type="button" class="btn-toggle" id="create-group-btn">➕ Create New Group</button>
+                            <button type="button" class="btn-toggle" id="join-group-btn">🔗 Join Existing Group</button>
+                        </div>
+                    </div>
+                    <div id="group-form-section" style="display: none;">
+                        <div class="form-group">
+                            <label for="group-name" class="form-label">Group Name</label>
+                            <input type="text" id="group-name" class="form-input" placeholder="e.g., My Movie Club">
+                        </div>
+                    </div>
+                    <div id="join-group-section" style="display: none;">
+                        <div class="form-group">
+                            <label for="group-code" class="form-label">Group Code</label>
+                            <input type="text" id="group-code" class="form-input" placeholder="e.g., ABC123" maxlength="6">
+                            <p class="form-hint">Ask your group admin for the group code</p>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">✓ Create Profile</button>
+                </form>
+            </div>
+            <div id="profile-display" style="display: none;">
+                <div class="profile-card">
+                    <h3 id="display-name"></h3>
+                    <p id="display-group"></p>
+                    <button id="edit-profile-btn" class="btn btn-secondary">Edit Profile</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="review-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✍️ Write a Review</h2>
+                <button class="modal-close" id="close-review-modal">&times;</button>
+            </div>
+            <form id="review-form" class="review-form">
+                <div class="form-group">
+                    <label for="review-movie-title" class="form-label">Movie</label>
+                    <input type="text" id="review-movie-title" class="form-input" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="review-rating" class="form-label">Rating (1-5 stars)</label>
+                    <div class="rating-input">
+                        <input type="range" id="review-rating" min="1" max="5" value="5" class="rating-slider">
+                        <div class="rating-display">
+                            <span id="rating-value">5</span>
+                            <span class="stars" id="rating-stars">★★★★★</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="review-text" class="form-label">Your Review</label>
+                    <textarea id="review-text" class="form-textarea" rows="6" placeholder="Share your thoughts about this movie..." required></textarea>
+                    <span class="char-count"><span id="review-char-count">0</span>/1000</span>
+                </div>
+                <button type="submit" class="btn btn-primary">✓ Submit Review</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Submission Modal -->
+    <div id="submission-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>➕ Submit Your Movies</h2>
+                <button class="modal-close" id="close-submission-modal">&times;</button>
+            </div>
+            <p class="modal-subtitle">Add your Top Pick and Wild Card for this season</p>
+            <form id="movie-form-modal">
+                <div class="form-group">
+                    <label for="title-modal" class="form-label">Movie Title</label>
+                    <input type="text" id="title-modal" class="form-input" placeholder="Enter movie title..." required>
+                </div>
+                <div class="form-group">
+                    <label for="movie-category-modal" class="form-label">Category</label>
+                    <select id="movie-category-modal" class="form-input" required>
+                        <option value="">Select category...</option>
+                        <option value="top-pick">⭐ Top Pick</option>
+                        <option value="wild-card">🎲 Wild Card</option>
+                    </select>
+                    <p class="form-hint">Top Pick: Your favorite recommendation. Wild Card: A fun surprise pick!</p>
+                </div>
+                <div class="form-group">
+                    <label for="description-modal" class="form-label">Why you love it</label>
+                    <textarea id="description-modal" class="form-textarea" rows="3" placeholder="Share what makes this movie special..." required></textarea>
+                    <span class="char-count"><span id="char-count-modal">0</span>/500</span>
+                </div>
+                <div class="poster-preview" id="poster-container-modal">
+                    <img id="poster-img-modal" src="" alt="Poster preview" hidden>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">✓ Submit Movie</button>
+                    <button type="button" id="close-submission-modal-btn" class="btn btn-secondary">Close</button>
+                </div>
+            </form>
+            <p id="status-modal" class="status"></p>
+        </div>
+    </div>
+
+    <header>
+        <div class="header-content">
+            <div class="header-hero">
+                <h1>CinemaClub</h1>
+                <p class="tagline">Where passionate film lovers unite to discover, discuss, and celebrate cinema</p>
+            </div>
+            <div class="menu-container">
+                <div class="menu-dropdown">
+                    <button type="button" class="btn btn-secondary menu-toggle">☰ Menu</button>
+                    <div class="menu-panel hidden">
+                        <button type="button" class="menu-item" data-action="profile">👤 View Profile</button>
+                        <button type="button" class="menu-item" data-action="switch-clubs">🔄 Switch Clubs</button>
+                        <button type="button" class="menu-item" data-action="logout">🚪 Log Out</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content" class="main-hidden">
+        <!-- Hero Section: This Week's Champion + Discussion -->
+        <section class="hero-section">
+            <div class="hero-winner">
+                <div class="section-header">
+                    <h2>🏆 This Week's Champion</h2>
+                    <p class="section-subtitle">The community's favorite</p>
+                </div>
+                <div id="current-winner" class="winner-showcase">
+                    <div class="winner-placeholder">🎬 No winner selected yet</div>
+                </div>
+            </div>
+            
+            <div class="hero-discussion">
+                <div class="section-header">
+                    <h3>💬 Weekly Discussion</h3>
+                    <p class="section-subtitle">Share your thoughts</p>
+                </div>
+                <div class="discussion-board-section" id="discussion-board">
+                    <button id="add-review-btn" class="btn btn-primary" style="margin-bottom: 1.5rem; width: 100%;">➕ Add Your Review</button>
+                    <div id="reviews-list" class="reviews-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Season Lineup: Main Interactive Feature -->
+        <section class="lineup-section">
+            <div class="section-header">
+                <h2>🎬 Season Lineup</h2>
+                <p class="section-subtitle" id="submission-count">Select a movie each week to reveal and discuss</p>
+            </div>
+            <div id="categories-container">
+                <div class="category-section">
+                    <h3 class="category-title">⭐ Top Pick</h3>
+                    <div id="top-pick-grid" class="submissions-grid"></div>
+                </div>
+                <div class="category-section">
+                    <h3 class="category-title">🎲 Wild Card</h3>
+                    <div id="wild-card-grid" class="submissions-grid"></div>
+                </div>
+            </div>
+            <div class="controls">
+                <button id="pick-now" class="btn btn-accent">🏆 Pick Winner</button>
+                <button id="reset-all" class="btn btn-secondary">↻ Reset</button>
+            </div>
+            <p id="status" class="status" role="status" aria-live="polite"></p>
+            <p class="note">✨ Movies remain hidden until selected as weekly winners</p>
+        </section>
+
+        <!-- Action & History: Secondary Content -->
+        <div class="secondary-content">
+            <section class="form-section">
+                <div class="section-header">
+                    <h2>➕ Submit Movie</h2>
+                    <p class="section-subtitle">Add to this season's lineup</p>
+                </div>
+                <p class="section-subtitle" id="season-info" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                    <span id="season-week-info">Season in progress</span>
+                </p>
+                <button id="open-submission-modal" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;">➕ Open Submission Portal</button>
+            </section>
+
+            <section class="history-section-standalone">
+                <div class="section-header">
+                    <h2>⭐ Hall of Fame</h2>
+                    <p class="section-subtitle">Past season winners</p>
+                </div>
+                <div id="history" class="history-timeline"></div>
+            </section>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

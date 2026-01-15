@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="Movie of the Week - Submit movies, vote on winners, track history.">
+    <title>CinemaClub — Dashboard</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%238b5cf6'/%3E%3Cstop offset='100%25' style='stop-color:%233b82f6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='100' height='100'/%3E%3Ctext x='50' y='65' font-size='60' font-weight='bold' text-anchor='middle' fill='%23fff'%3E🎬%3C/text%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Profile Modal -->
+    <div id="profile-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>👤 Create Your Profile</h2>
+                <button class="modal-close" id="close-profile-modal">&times;</button>
+            </div>
+            <div id="profile-form-container">
+                <form id="profile-form" class="profile-form">
+                    <div class="form-group">
+                        <label for="profile-name" class="form-label">Your Name</label>
+                        <input type="text" id="profile-name" class="form-input" placeholder="Enter your name..." required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Favorite Genres (select all that apply)</label>
+                        <div class="genre-list">
+                            <label class="checkbox"><input type="checkbox" name="genre" value="Action"> Action</label>
+                            <label class="checkbox"><input type="checkbox" name="genre" value="Comedy"> Comedy</label>
+                            <label class="checkbox"><input type="checkbox" name="genre" value="Drama"> Drama</label>
+                            <label class="checkbox"><input type="checkbox" name="genre" value="Horror"> Horror</label>
+                            <label class="checkbox"><input type="checkbox" name="genre" value="Sci-Fi"> Sci-Fi</label>
+                            <label class="checkbox"><input type="checkbox" name="genre" value="Thriller"> Thriller</label>
+                        </div>
+                    </div>
+                    <div id="group-choice" class="form-group">
+                        <label class="form-label">Movie Club Group</label>
+                        <div class="group-buttons">
+                            <button type="button" class="btn-toggle" id="create-group-btn">➕ Create New Group</button>
+                            <button type="button" class="btn-toggle" id="join-group-btn">🔗 Join Existing Group</button>
+                        </div>
+                    </div>
+                    <div id="group-form-section" style="display: none;">
+                        <div class="form-group">
+                            <label for="group-name" class="form-label">Group Name</label>
+                            <input type="text" id="group-name" class="form-input" placeholder="e.g., My Movie Club">
+                        </div>
+                    </div>
+                    <div id="join-group-section" style="display: none;">
+                        <div class="form-group">
+                            <label for="group-code" class="form-label">Group Code</label>
+                            <input type="text" id="group-code" class="form-input" placeholder="e.g., ABC123" maxlength="6">
+                            <p class="form-hint">Ask your group admin for the group code</p>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">✓ Create Profile</button>
+                </form>
+            </div>
+            <div id="profile-display" style="display: none;">
+                <div class="profile-card">
+                    <h3 id="display-name"></h3>
+                    <p id="display-group"></p>
+                    <button id="edit-profile-btn" class="btn btn-secondary">Edit Profile</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="review-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✍️ Write a Review</h2>
+                <button class="modal-close" id="close-review-modal">&times;</button>
+            </div>
+            <form id="review-form" class="review-form">
+                <div class="form-group">
+                    <label for="review-movie-title" class="form-label">Movie</label>
+                    <input type="text" id="review-movie-title" class="form-input" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="review-rating" class="form-label">Rating (1-5 stars)</label>
+                    <div class="rating-input">
+                        <input type="range" id="review-rating" min="1" max="5" value="5" class="rating-slider">
+                        <div class="rating-display">
+                            <span id="rating-value">5</span>
+                            <span class="stars" id="rating-stars">★★★★★</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="review-text" class="form-label">Your Review</label>
+                    <textarea id="review-text" class="form-textarea" rows="6" placeholder="Share your thoughts about this movie..." required></textarea>
+                    <span class="char-count"><span id="review-char-count">0</span>/1000</span>
+                </div>
+                <button type="submit" class="btn btn-primary">✓ Submit Review</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Clubs Modal -->
+    <div id="clubs-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🎬 Your Clubs</h2>
+                <button class="modal-close" id="close-clubs-modal">&times;</button>
+            </div>
+            <div id="clubs-modal-status" class="status" role="status" aria-live="polite"></div>
+            <div id="clubs-modal-list" class="details-list"></div>
+        </div>
+    </div>
+
+    <!-- Submission Modal -->
+    <div id="submission-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>➕ Submit Your Movies</h2>
+                <button class="modal-close" id="close-submission-modal">&times;</button>
+            </div>
+            <p class="modal-subtitle">Submit one movie for each category this season</p>
+            <div id="category-requirements" class="category-requirements"></div>
+            <form id="movie-form-modal">
+                <div class="form-group">
+                    <label for="title-modal" class="form-label">Movie Title</label>
+                    <input type="text" id="title-modal" class="form-input" placeholder="Enter movie title..." required>
+                </div>
+                <div class="form-group">
+                    <label for="movie-category-modal" class="form-label">Category</label>
+                    <select id="movie-category-modal" class="form-input" required>
+                        <option value="">Select category...</option>
+                        <option value="top-pick">⭐ Top Pick</option>
+                        <option value="wild-card">🎲 Wild Card</option>
+                    </select>
+                    <p class="form-hint">Top Pick: Your favorite recommendation. Wild Card: A fun surprise pick!</p>
+                </div>
+                <div class="form-group">
+                    <label for="description-modal" class="form-label">Why you love it</label>
+                    <textarea id="description-modal" class="form-textarea" rows="3" placeholder="Share what makes this movie special..." required></textarea>
+                    <span class="char-count"><span id="char-count-modal">0</span>/500</span>
+                </div>
+                <div class="poster-preview" id="poster-container-modal">
+                    <img id="poster-img-modal" src="" alt="Poster preview" hidden>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">✓ Submit Movie</button>
+                    <button type="button" id="close-submission-modal-btn" class="btn btn-secondary">Close</button>
+                </div>
+            </form>
+            <p id="status-modal" class="status"></p>
+        </div>
+    </div>
+
+    <header>
+        <div class="header-content">
+            <div class="header-hero">
+                <h1 id="club-header-name">Your Club</h1>
+                <p class="tagline">Where passionate film lovers unite to discover, discuss, and celebrate cinema</p>
+            </div>
+            <div class="menu-container">
+                <div class="menu-dropdown">
+                    <button type="button" class="btn btn-secondary menu-toggle">☰ Menu</button>
+                    <div class="menu-panel hidden">
+                        <button type="button" class="menu-item" data-action="profile">👤 View Profile</button>
+                        <button type="button" class="menu-item" data-action="view-clubs">🎬 View Clubs</button>
+                        <button type="button" class="menu-item" data-action="logout">🚪 Log Out</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content">
+        <div class="season-switcher">
+            <label for="season-select" class="form-label">Season</label>
+            <select id="season-select" class="form-input"></select>
+            <label for="week-select" class="form-label">Week</label>
+            <select id="week-select" class="form-input"></select>
+        </div>
+        <div class="main-actions">
+            <button type="button" id="open-club-details" class="btn btn-secondary">🎬 Club Details</button>
+            <div id="club-details-popover" class="menu-popover hidden" aria-live="polite">
+                <div class="menu-popover-header">
+                    <span>Club Details</span>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button type="button" id="edit-club-settings" class="btn btn-secondary">Edit</button>
+                        <button type="button" id="close-club-details" class="btn btn-secondary">Close</button>
+                    </div>
+                </div>
+                <div class="details-list">
+                    <div class="detail-row">
+                        <span class="detail-label">Club Name</span>
+                        <span id="club-name" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Club Code</span>
+                        <span id="club-code" class="detail-value"></span>
+                        <button type="button" id="copy-club-code" class="btn btn-secondary">Copy</button>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Season Length</span>
+                        <span id="club-season-length" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Submissions Per User</span>
+                        <span id="club-submissions-per-user" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Categories</span>
+                        <span id="club-categories" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Current Week</span>
+                        <span id="club-current-week" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Members</span>
+                        <span id="club-members" class="detail-value"></span>
+                    </div>
+                </div>
+                <form id="club-settings-form" class="group-form hidden" style="margin-top: 1rem;">
+                    <div class="form-group">
+                        <label for="club-name-input" class="form-label">Club Name</label>
+                        <input type="text" id="club-name-input" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="club-season-length-input" class="form-label">Season Length (weeks)</label>
+                        <input type="number" id="club-season-length-input" class="form-input" min="4" max="52" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="club-submissions-input" class="form-label">Submissions Per User</label>
+                        <input type="number" id="club-submissions-input" class="form-input" min="1" max="20" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="club-categories-input" class="form-label">Categories (comma separated)</label>
+                        <input type="text" id="club-categories-input" class="form-input" placeholder="top-pick, wild-card" required>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">Save</button>
+                        <button type="button" id="cancel-club-settings" class="btn btn-secondary" style="flex: 1;">Cancel</button>
+                    </div>
+                    <button type="button" id="delete-club-btn" class="btn btn-secondary" style="width: 100%; margin-top: 0.75rem;">Delete Club</button>
+                </form>
+                <div id="admin-section" class="group-form hidden" style="margin-top: 1rem;">
+                    <div class="form-group">
+                        <label for="admin-select" class="form-label">Add Admin</label>
+                        <select id="admin-select" class="form-input"></select>
+                    </div>
+                    <button type="button" id="add-admin-btn" class="btn btn-secondary" style="width: 100%;">Add Admin</button>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label for="reset-user-select" class="form-label">Reset User Submissions</label>
+                        <select id="reset-user-select" class="form-input"></select>
+                    </div>
+                    <button type="button" id="reset-user-btn" class="btn btn-secondary" style="width: 100%;">Reset User</button>
+                </div>
+            </div>
+        </div>
+        <!-- Hero Section: This Week's Champion + Discussion -->
+        <section class="hero-section">
+            <div class="hero-winner">
+                <div class="section-header">
+                    <h2>🏆 This Week's Champion</h2>
+                    <p class="section-subtitle">The community's favorite</p>
+                </div>
+                <div id="current-winner" class="winner-showcase">
+                    <div class="winner-placeholder">🎬 No winner selected yet</div>
+                </div>
+            </div>
+            
+            <div class="hero-discussion">
+                <div class="section-header">
+                    <h3>💬 Weekly Discussions</h3>
+                    <p class="section-subtitle">Share your thoughts on each winner</p>
+                </div>
+                <div class="discussion-board-section" id="discussion-boards"></div>
+            </div>
+        </section>
+
+        <!-- Season Lineup: Main Interactive Feature -->
+        <section class="lineup-section">
+            <div class="section-header">
+                <h2>🎬 Season Lineup</h2>
+                <p class="section-subtitle" id="submission-count">Select a movie each week to reveal and discuss</p>
+            </div>
+            <div id="categories-container">
+                <div class="category-section">
+                    <h3 class="category-title">⭐ Top Pick</h3>
+                    <div id="top-pick-grid" class="submissions-grid"></div>
+                </div>
+                <div class="category-section">
+                    <h3 class="category-title">🎲 Wild Card</h3>
+                    <div id="wild-card-grid" class="submissions-grid"></div>
+                </div>
+            </div>
+            <div class="controls">
+                <button id="pick-now" class="btn btn-accent">🏆 Pick Winner</button>
+                <button id="reset-all" class="btn btn-secondary">↻ Reset</button>
+            </div>
+            <p id="status" class="status" role="status" aria-live="polite"></p>
+            <p class="note">✨ Movies remain hidden until selected as weekly winners</p>
+        </section>
+
+        <!-- Action & History: Secondary Content -->
+        <div class="secondary-content">
+            <section class="form-section">
+                <div class="section-header">
+                    <h2>➕ Submit Movie</h2>
+                    <p class="section-subtitle">Add to this season's lineup</p>
+                </div>
+                <p class="section-subtitle" id="season-info" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                    <span id="season-week-info">Season in progress</span>
+                </p>
+                <button id="start-new-season-btn" class="btn btn-accent" style="display: none; width: 100%; margin-top: 1rem;">✨ Start New Season</button>
+                <button id="open-submission-modal" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;">➕ Open Submission Portal</button>
+            </section>
+
+            <section class="history-section-standalone">
+                <div class="section-header">
+                    <h2>⭐ Hall of Fame</h2>
+                    <p class="section-subtitle">Past season winners</p>
+                </div>
+                <div id="history" class="history-timeline"></div>
+            </section>
+        </div>
+    </main>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

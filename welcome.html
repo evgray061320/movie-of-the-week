@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="Join or create a movie club - CinemaClub">
+    <title>Welcome to Movie Club Central</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%238b5cf6'/%3E%3Cstop offset='100%25' style='stop-color:%233b82f6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='100' height='100'/%3E%3Ctext x='50' y='65' font-size='60' font-weight='bold' text-anchor='middle' fill='%23fff'%3E🎬%3C/text%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .welcome-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .welcome-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 24px;
+            padding: 3rem;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            animation: slideUp 0.6s ease-out;
+        }
+        .welcome-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .welcome-header h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            margin: 0 0 1rem 0;
+            background: linear-gradient(135deg, #ffffff 0%, #d4af37 50%, #c41e3a 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientMove 3s ease infinite;
+        }
+        .welcome-header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-container menu-container-fixed">
+        <div class="menu-dropdown">
+            <button type="button" class="btn btn-secondary menu-toggle">☰ Menu</button>
+            <div class="menu-panel hidden">
+                <button type="button" class="menu-item" data-action="profile">👤 View Profile</button>
+                <button type="button" class="menu-item" data-action="switch-clubs">🔄 Switch Clubs</button>
+                <button type="button" class="menu-item" data-action="logout">🚪 Log Out</button>
+            </div>
+        </div>
+    </div>
+    <div class="welcome-container">
+        <div class="welcome-card">
+            <div class="welcome-header">
+                <h1>🎬 Movie Club Central</h1>
+                <p>Manage your clubs, create a new one, or join an existing club</p>
+            </div>
+            
+            <div class="setup-tabs">
+                <button class="setup-tab-btn active" data-tab="myclubs">⭐ My Clubs</button>
+                <button class="setup-tab-btn" data-tab="create">➕ Create Club</button>
+                <button class="setup-tab-btn" data-tab="join">🔗 Join Club</button>
+            </div>
+
+            <!-- My Clubs Tab -->
+            <div id="myclubs-tab" class="setup-tab-content active">
+                <div id="my-clubs-content">
+                    <div id="my-clubs-loading" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                        Loading your clubs...
+                    </div>
+                    <div id="my-clubs-list" style="display: none;">
+                        <!-- Clubs will be populated here -->
+                    </div>
+                    <div id="my-clubs-empty" style="display: none; text-align: center; padding: 2rem;">
+                        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">You're not a member of any clubs yet.</p>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Create a new club or join an existing one to get started!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Create Club Tab -->
+            <div id="create-tab" class="setup-tab-content">
+                <form id="create-group-form" class="group-form">
+                    <div class="form-group">
+                        <label for="setup-club-name" class="form-label">Club Name</label>
+                        <input type="text" id="setup-club-name" class="form-input" placeholder="e.g., My Awesome Movie Club" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="setup-season-length" class="form-label">Season Length (weeks)</label>
+                        <input type="number" id="setup-season-length" class="form-input" min="4" max="52" value="14" required>
+                        <p class="form-hint">How many weeks will your season run? (4-52 weeks)</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="setup-submissions-per-user" class="form-label">Submissions Per User</label>
+                        <input type="number" id="setup-submissions-per-user" class="form-input" min="1" max="20" value="7" required>
+                        <p class="form-hint">How many movies can each member submit per season?</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="setup-category-count" class="form-label">Number of Categories</label>
+                        <div style="display: flex; gap: 0.75rem; align-items: center;">
+                            <input type="number" id="setup-category-count" class="form-input" min="1" max="10" value="2" required style="flex: 1;">
+                            <button type="button" id="category-count-decrease" class="btn btn-secondary" style="min-width: 3rem;">−</button>
+                            <button type="button" id="category-count-increase" class="btn btn-secondary" style="min-width: 3rem;">＋</button>
+                        </div>
+                        <p class="form-hint">Choose how many categories your club will use (1-10)</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Movie Categories</label>
+                        <p class="form-hint" style="margin-bottom: 1rem;">Type a name for each category:</p>
+                        <div id="setup-category-inputs" class="category-inputs"></div>
+                        <p class="form-hint" style="margin-top: 0.5rem;">At least one category name is required</p>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">✓ Create Club</button>
+                </form>
+                <div id="create-success" style="display: none;">
+                    <div class="success-box show">
+                        <h3>✓ Club Created!</h3>
+                        <p class="code-display" id="club-code-display"></p>
+                        <p class="code-hint">Share this code with friends so they can join your club</p>
+                        <button id="start-club-btn" class="btn btn-primary">Go to Dashboard</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Join Club Tab -->
+            <div id="join-tab" class="setup-tab-content">
+                <form id="join-group-form" class="group-form">
+                    <div class="form-group">
+                        <label for="join-club-code" class="form-label">Club Code</label>
+                        <input type="text" id="join-club-code" class="form-input" placeholder="e.g., ABC123" maxlength="6" required>
+                        <p class="form-hint">Ask your club admin for the club code</p>
+                    </div>
+                    <button type="submit" class="btn btn-primary">✓ Join Club</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="profile-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>👤 Your Profile</h2>
+                <button class="modal-close" id="close-profile-modal">&times;</button>
+            </div>
+            <div class="profile-card">
+                <h3 id="display-name"></h3>
+                <p id="display-group"></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="welcome.js"></script>
+</body>
+</html>
