@@ -221,10 +221,29 @@ async function refreshList() {
 	const url = (SERVER_URL || '') + '/submissions';
 	try {
 		const res = await fetch(url);
-		const list = await res.json();
+		const allSubmissions = await res.json();
+		
+		// Filter submissions by current group and season
+		const currentGroupId = currentGroup?.id || null;
+		const currentSeasonNumber = getActiveSeasonNumber();
+		
+		const filteredList = (allSubmissions || []).filter(item => {
+			// Match group: if we have a group, item must match; if no group, item must not have a group
+			const matchesGroup = currentGroupId 
+				? (item.groupId === currentGroupId)
+				: (!item.groupId);
+			
+			// Match season: if we have a season, item must match; if no season, allow any
+			const matchesSeason = currentSeasonNumber
+				? (item.seasonNumber === currentSeasonNumber)
+				: true;
+			
+			return matchesGroup && matchesSeason;
+		});
+		
 		// Fetch posters for items that don't have them
 		// The server should enrich them, but we'll also try client-side as fallback
-		const posterPromises = list.map(async (item) => {
+		const posterPromises = filteredList.map(async (item) => {
 			if (!item.posterUrl && item.title) {
 				try {
 					const posterUrl = await fetchPoster(item.title);
@@ -241,8 +260,9 @@ async function refreshList() {
 			Promise.all(posterPromises),
 			new Promise(resolve => setTimeout(resolve, 3000)) // Max 3 seconds
 		]);
-		renderList(list);
+		renderList(filteredList);
 	} catch (err) {
+		console.error('Failed to load submissions:', err);
 		if (topPickGrid) topPickGrid.innerHTML = '<p class="error">Could not load submissions.</p>';
 		if (wildCardGrid) wildCardGrid.innerHTML = '';
 	}
