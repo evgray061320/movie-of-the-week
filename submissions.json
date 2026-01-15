@@ -1,50 +1,5 @@
 {
-  "submissions": [
-    {
-      "id": "mkfy24k7",
-      "title": "Inside Out",
-      "description": "A joyful, heartwarming adventure.",
-      "category": "wild-card",
-      "posterUrl": null,
-      "userId": "mkfu8xlm",
-      "groupId": "mkfxtyv3",
-      "submittedAt": "2026-01-15T21:10:55.639Z",
-      "seasonNumber": 1
-    },
-    {
-      "id": "mkfy24kd",
-      "title": "The Godfather",
-      "description": "A classic tale of family and power.",
-      "category": "fan-favorite",
-      "posterUrl": null,
-      "userId": "mkfu8xlm",
-      "groupId": "mkfxtyv3",
-      "submittedAt": "2026-01-15T21:10:55.645Z",
-      "seasonNumber": 1
-    },
-    {
-      "id": "mkfy6vpc",
-      "title": "Marcel the Shell",
-      "description": "surprisingly good",
-      "category": "wild-card",
-      "posterUrl": "https://m.media-amazon.com/images/M/MV5BMmVhYWEzMGEtZjhkYS00ZWE0LTlhOWQtZTRlODZlMTM0Y2JmXkEyXkFqcGc@._V1_SX300.jpg",
-      "userId": "mkfu8xlm",
-      "groupId": "mkfy63rz",
-      "submittedAt": "2026-01-15T21:14:37.440Z",
-      "seasonNumber": 1
-    },
-    {
-      "id": "mkfy77i2",
-      "title": "The Notebook",
-      "description": "They die together",
-      "category": "fan-favorite",
-      "posterUrl": "https://m.media-amazon.com/images/M/MV5BZjE0ZjgzMzYtMTAxYi00NGMzLThmZDktNzFlMzA2MWRmYWQ0XkEyXkFqcGc@._V1_SX300.jpg",
-      "userId": "mkfu8xlm",
-      "groupId": "mkfy63rz",
-      "submittedAt": "2026-01-15T21:14:52.730Z",
-      "seasonNumber": 1
-    }
-  ],
+  "submissions": [],
   "history": [
     {
       "id": "mkfy7ig0",
@@ -635,39 +590,7 @@
     "currentWeek": 1,
     "endDate": null
   },
-  "userSubmissions": {
-    "season_1_mkfxtyv3_mkfu8xlm": [
-      {
-        "category": "wild-card",
-        "title": "Inside Out",
-        "submittedAt": "2026-01-15T21:10:55.639Z"
-      },
-      {
-        "category": "fan-favorite",
-        "title": "The Godfather",
-        "submittedAt": "2026-01-15T21:10:55.645Z"
-      }
-    ],
-    "season_1_mkfu8xlm": [
-      {
-        "category": "wild-card",
-        "title": "Finding Nemo",
-        "submittedAt": "2026-01-15T21:08:06.503Z"
-      }
-    ],
-    "season_1_mkfy63rz_mkfu8xlm": [
-      {
-        "category": "wild-card",
-        "title": "Marcel the Shell",
-        "submittedAt": "2026-01-15T21:14:37.440Z"
-      },
-      {
-        "category": "fan-favorite",
-        "title": "The Notebook",
-        "submittedAt": "2026-01-15T21:14:52.730Z"
-      }
-    ]
-  },
+  "userSubmissions": {},
   "submissionArchive": [
     {
       "id": "mkfy24k7",
