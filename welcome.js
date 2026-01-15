@@ -136,31 +136,117 @@ async function loadMyClubs() {
   listEl.style.display = 'none';
   emptyEl.style.display = 'none';
   
-  const currentGroup = loadCurrentGroup();
-  
-  if (currentGroup && currentGroup.id) {
-    // User has a club, display it
-    loadingEl.style.display = 'none';
-    listEl.style.display = 'block';
-    listEl.innerHTML = `
-      <div class="club-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; margin-bottom: 1rem;">
-        <h3 style="margin: 0 0 1rem 0; color: var(--text-primary);">${currentGroup.name || 'My Club'}</h3>
-        <p style="margin: 0.5rem 0; color: var(--text-secondary);">
-          <strong>Club Code:</strong> <span style="color: var(--gold); font-family: 'Space Mono', monospace; font-weight: 700;">${currentGroup.code || 'N/A'}</span>
-        </p>
-        <p style="margin: 0.5rem 0; color: var(--text-secondary);">
-          <strong>Members:</strong> ${currentGroup.members ? currentGroup.members.length : 0}
-        </p>
-        <button class="btn btn-primary" style="margin-top: 1rem; width: 100%;" onclick="window.location.replace('dashboard.html')">
-          Go to Dashboard
-        </button>
-      </div>
-    `;
-  } else {
-    // User doesn't have a club
+  const currentUser = loadCurrentUser();
+  if (!currentUser || !currentUser.id) {
     loadingEl.style.display = 'none';
     emptyEl.style.display = 'block';
+    return;
   }
+  
+  try {
+    // Fetch all clubs the user is a member of from the API
+    const res = await fetch(`${SERVER_URL}/user/${currentUser.id}/clubs`);
+    const data = await res.json();
+    
+    if (!res.ok || !data.ok) {
+      throw new Error(data.error || 'Failed to load clubs');
+    }
+    
+    const clubs = data.clubs || [];
+    const currentGroup = loadCurrentGroup();
+    
+    if (clubs.length === 0) {
+      // User doesn't have any clubs
+      loadingEl.style.display = 'none';
+      emptyEl.style.display = 'block';
+      return;
+    }
+    
+    // Display all clubs
+    loadingEl.style.display = 'none';
+    listEl.style.display = 'block';
+    listEl.innerHTML = '';
+    
+    clubs.forEach((club) => {
+      const isCurrent = club.id && currentGroup?.id && club.id === currentGroup.id;
+      const roleLabel = club.isAdmin ? ' <span style="color: var(--gold);">(Admin)</span>' : '';
+      const clubCard = document.createElement('div');
+      clubCard.className = 'club-card';
+      clubCard.style.cssText = 'background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; margin-bottom: 1rem; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;';
+      clubCard.innerHTML = `
+        <h3 style="margin: 0 0 1rem 0; color: var(--text-primary);">${escapeHtml(club.name || 'My Club')}${roleLabel}</h3>
+        <p style="margin: 0.5rem 0; color: var(--text-secondary);">
+          <strong>Club Code:</strong> <span style="color: var(--gold); font-family: \'Space Mono\', monospace; font-weight: 700;">${escapeHtml(club.code || 'N/A')}</span>
+        </p>
+        <p style="margin: 0.5rem 0; color: var(--text-secondary);">
+          <strong>Members:</strong> ${club.membersCount || (club.members ? club.members.length : 0)}
+        </p>
+        <button class="btn ${isCurrent ? 'btn-secondary' : 'btn-primary'}" style="margin-top: 1rem; width: 100%;" data-club-id="${escapeHtml(club.id)}">
+          ${isCurrent ? '✓ Current Club' : 'Go to Dashboard'}
+        </button>
+      `;
+      
+      // Add hover effect
+      clubCard.addEventListener('mouseenter', () => {
+        if (!isCurrent) {
+          clubCard.style.transform = 'translateY(-2px)';
+          clubCard.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+        }
+      });
+      clubCard.addEventListener('mouseleave', () => {
+        clubCard.style.transform = '';
+        clubCard.style.boxShadow = '';
+      });
+      
+      // Add click handler to switch to this club and go to dashboard
+      const button = clubCard.querySelector('button');
+      if (button && !isCurrent) {
+        button.addEventListener('click', (e) => {
+          e.stopPropagation();
+          switchToClub(club);
+        });
+      }
+      
+      // Also make the entire card clickable
+      if (!isCurrent) {
+        clubCard.addEventListener('click', () => {
+          switchToClub(club);
+        });
+      }
+      
+      listEl.appendChild(clubCard);
+    });
+  } catch (err) {
+    console.error('Failed to load clubs:', err);
+    loadingEl.style.display = 'none';
+    emptyEl.style.display = 'block';
+    emptyEl.innerHTML = '<p style="color: var(--text-secondary);">Failed to load clubs. Please try again.</p>';
+  }
+}
+
+// Switch to a specific club and navigate to dashboard
+function switchToClub(club) {
+  if (!club || !club.id) return;
+  
+  // Update current user's groupId
+  const currentUser = loadCurrentUser();
+  if (currentUser) {
+    currentUser.groupId = club.id;
+    setStoredUser(currentUser);
+  }
+  
+  // Save club to localStorage
+  localStorage.setItem('movieClubGroup', JSON.stringify(club));
+  
+  // Navigate to dashboard
+  window.location.replace('dashboard.html');
+}
+
+// Simple HTML escape function
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 // Initialize welcome page
