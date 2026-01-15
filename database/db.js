@@ -1,0 +1,65 @@
+// Database connection and query helpers
+const { Pool } = require('pg');
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL?.includes('localhost') ? false : {
+    rejectUnauthorized: false
+  }
+});
+
+// Test connection
+pool.on('connect', () => {
+  console.log('✅ Connected to PostgreSQL database');
+});
+
+pool.on('error', (err) => {
+  console.error('❌ Unexpected error on idle client', err);
+  process.exit(-1);
+});
+
+// Helper function to run queries
+async function query(text, params) {
+  const start = Date.now();
+  try {
+    const res = await pool.query(text, params);
+    const duration = Date.now() - start;
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Executed query', { text, duration, rows: res.rowCount });
+    }
+    return res;
+  } catch (error) {
+    console.error('Database query error:', error);
+    throw error;
+  }
+}
+
+// Initialize database schema
+async function initializeDatabase() {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const schemaPath = path.join(__dirname, 'schema.sql');
+    const schema = fs.readFileSync(schemaPath, 'utf8');
+    
+    // Split by semicolons and execute each statement
+    const statements = schema.split(';').filter(stmt => stmt.trim().length > 0);
+    
+    for (const statement of statements) {
+      if (statement.trim()) {
+        await query(statement);
+      }
+    }
+    
+    console.log('✅ Database schema initialized');
+  } catch (error) {
+    console.error('❌ Error initializing database:', error);
+    // Don't throw - schema might already exist
+  }
+}
+
+module.exports = {
+  query,
+  pool,
+  initializeDatabase
+};
