@@ -393,6 +393,20 @@
       ],
       "createdAt": "2026-01-15T19:24:14.746Z",
       "groupId": "mkfy63rz"
+    },
+    {
+      "id": "mkfz9ru5",
+      "username": "EleanorGray",
+      "name": "EleanorGray",
+      "password": "Passpass1",
+      "securityQuestion": "school",
+      "securityAnswer": "colonial hills",
+      "genres": [
+        "Horror",
+        "Thriller"
+      ],
+      "createdAt": "2026-01-15T21:44:52.013Z",
+      "groupId": "mkfza9yb"
     }
   ],
   "groups": [
@@ -548,6 +562,30 @@
       "season": {
         "number": 1,
         "startDate": "2026-01-15T21:14:05.185Z",
+        "currentWeek": 1,
+        "endDate": null
+      }
+    },
+    {
+      "id": "mkfza9yb",
+      "name": "2026 Movie Fantasy Draft",
+      "creatorId": "mkfz9ru5",
+      "code": "HQ5NFJ",
+      "members": [
+        "mkfz9ru5"
+      ],
+      "createdAt": "2026-01-15T21:45:15.491Z",
+      "settings": {
+        "seasonLength": 10,
+        "submissionsPerUser": 2,
+        "categories": [
+          "fan-favorite",
+          "wild-card"
+        ]
+      },
+      "season": {
+        "number": 1,
+        "startDate": "2026-01-15T21:45:19.687Z",
         "currentWeek": 1,
         "endDate": null
       }

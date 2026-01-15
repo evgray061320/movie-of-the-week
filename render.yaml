@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: movie-of-the-week
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Optional: Add your OMDb API key here if you have one
+      # - key: OMDB_API_KEY
+      #   value: your-api-key-here

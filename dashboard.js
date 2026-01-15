@@ -1,7 +1,7 @@
 // Configuration: set your OMDb API key here
 const OMDB_API_KEY = 'bafff0b8';
-// If your backend runs on another origin, set SERVER_URL accordingly (e.g. 'http://localhost:3000')
-const SERVER_URL = 'http://localhost:3000';
+// Auto-detect server URL: use current origin (works for both localhost and deployed)
+const SERVER_URL = window.location.origin;
 
 // Clear redirect flag from welcome page when dashboard loads
 const REDIRECT_KEY = 'cinemaclub_redirecting';

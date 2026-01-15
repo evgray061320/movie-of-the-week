@@ -1,5 +1,6 @@
 // Welcome page - handles club creation and joining
-const SERVER_URL = 'http://localhost:3000';
+// Auto-detect server URL: use current origin (works for both localhost and deployed)
+const SERVER_URL = window.location.origin;
 
 // Check if already redirecting (using sessionStorage to persist across potential re-executions)
 const REDIRECT_KEY = 'cinemaclub_redirecting';

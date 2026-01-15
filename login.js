@@ -1,5 +1,6 @@
 // Login/Signup page - handles user authentication
-const SERVER_URL = 'http://localhost:3000';
+// Auto-detect server URL: use current origin (works for both localhost and deployed)
+const SERVER_URL = window.location.origin;
 const REDIRECT_KEY = 'cinemaclub_redirecting';
 const USER_STORAGE_KEY = 'movieClubUser';
 
