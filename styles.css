@@ -136,7 +136,7 @@ header::after {
   position: absolute;
   top: 1.5rem;
   right: 2rem;
-  z-index: 5;
+  z-index: 100;
 }
 
 .menu-container-fixed {
@@ -145,6 +145,7 @@ header::after {
 
 .menu-dropdown {
   position: relative;
+  z-index: 100;
 }
 
 .menu-toggle {
@@ -168,6 +169,7 @@ header::after {
   gap: 0.25rem;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  z-index: 100;
 }
 
 .menu-panel.hidden {
