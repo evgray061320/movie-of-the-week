@@ -811,9 +811,9 @@ app.post('/group/:id/delete', async (req, res) => {
     await data.deleteSubmissions({ groupId: id });
     await data.deleteHistory({ groupId: id });
 
-  // Remove group reviews and watched entries
-  db.reviews = db.reviews.filter(r => r.groupId !== id);
-  db.watched = db.watched.filter(w => w.groupId !== id);
+    // Remove group reviews and watched entries
+    await data.deleteReviews({ groupId: id });
+    await data.deleteWatched({ groupId: id });
 
     // Remove group user submission tracking
     await data.deleteUserSubmissionsByGroup(id);
