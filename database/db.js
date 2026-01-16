@@ -52,6 +52,24 @@ async function initializeDatabase() {
       }
     }
     
+    // Add description column if it doesn't exist (migration for existing databases)
+    try {
+      const checkResult = await query(`
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_name='groups' AND column_name='description'
+      `);
+      
+      if (checkResult.rows.length === 0) {
+        console.log('Adding description column to groups table...');
+        await query('ALTER TABLE groups ADD COLUMN description TEXT');
+        console.log('✅ Description column added');
+      }
+    } catch (migrationError) {
+      // Ignore migration errors - column might already exist or table might not exist yet
+      console.log('Note: Could not add description column (may already exist):', migrationError.message);
+    }
+    
     console.log('✅ Database schema initialized');
   } catch (error) {
     console.error('❌ Error initializing database:', error);
