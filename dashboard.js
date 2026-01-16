@@ -1437,9 +1437,21 @@ function updateAdminControls() {
 		admins = currentGroup.admins;
 	} else if (currentGroup?.creatorId) {
 		admins = [currentGroup.creatorId];
+	} else if (currentGroup?.creator_id) {
+		// Handle database field name (creator_id) as fallback
+		admins = [currentGroup.creator_id];
 	}
 	
 	const isAdmin = currentUser?.id && admins.includes(currentUser.id);
+	
+	// Debug logging (temporary - can remove after fixing)
+	// console.log('updateAdminControls:', {
+	// 	userId: currentUser?.id,
+	// 	admins,
+	// 	isAdmin,
+	// 	currentGroupCreatorId: currentGroup?.creatorId || currentGroup?.creator_id,
+	// 	hasGroupDetailsCache: !!groupDetailsCache
+	// });
 	
 	// Debug logging (can be removed in production)
 	// console.log('updateAdminControls:', { 
