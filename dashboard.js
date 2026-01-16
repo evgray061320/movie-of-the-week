@@ -2287,7 +2287,6 @@ async function initialize() {
 	
 	// Render profile now that elements are available
 	displayProfile();
-	renderClubDetails();
 	
 	// Load group settings and update UI
 	loadGroupSettings();
@@ -2299,8 +2298,8 @@ async function initialize() {
 	}
 	await checkUserSubmissionStatus();
 	renderCategoryRequirements();
-	renderClubDetails();
-
+	
+	// Load group details FIRST to get admin info before rendering
 	const groupDetails = await loadGroupDetails();
 	if (groupDetails) {
 		// Update currentGroup with admin info from groupDetails
