@@ -1384,6 +1384,9 @@ function populateSettingsForm() {
 	if (clubNameInput) {
 		clubNameInput.value = currentGroup.name || '';
 	}
+	if (clubDescriptionInput) {
+		clubDescriptionInput.value = groupDetailsCache?.description || currentGroup?.description || '';
+	}
 	if (clubSeasonLengthInput) {
 		clubSeasonLengthInput.value = currentGroup.settings?.seasonLength || 14;
 	}
