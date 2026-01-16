@@ -44,6 +44,9 @@ html {
   /* Android Chrome fix for preventing zoom on input focus */
   -webkit-tap-highlight-color: rgba(212, 175, 55, 0.3);
   tap-highlight-color: rgba(212, 175, 55, 0.3);
+  /* Prevent viewport height changes on mobile browsers */
+  height: 100%;
+  height: -webkit-fill-available;
 }
 
 body {
@@ -59,9 +62,14 @@ body {
   animation: gradientShift 20s ease infinite;
   color: var(--text-primary);
   line-height: 1.65;
+  /* Use -webkit-fill-available for mobile to prevent viewport zoom loop */
   min-height: 100vh;
+  min-height: -webkit-fill-available;
   position: relative;
   overflow-x: hidden;
+  /* Prevent layout thrashing on Android */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 /* Animated gradient background */
@@ -1587,6 +1595,7 @@ select {
   max-width: 500px;
   width: 100%;
   max-height: 90vh;
+  max-height: -webkit-fill-available;
   overflow-y: auto;
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -2019,6 +2028,24 @@ main:not(.main-hidden) {
 @media (max-width: 480px) {
   html {
     font-size: 14px;
+    /* Lock viewport height on mobile to prevent zoom loop */
+    height: 100%;
+    height: -webkit-fill-available;
+  }
+
+  body {
+    /* Prevent viewport height changes on Android Chrome */
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    /* Prevent layout thrashing */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
   }
 
   header {
