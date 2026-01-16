@@ -1408,8 +1408,25 @@ function normalizeCategory(value) {
 }
 
 function updateAdminControls() {
-	const admins = groupDetailsCache?.admins || (currentGroup ? [currentGroup.creatorId] : []);
+	// Get admins from cache, or fall back to currentGroup, or just creatorId
+	let admins = [];
+	if (groupDetailsCache?.admins && Array.isArray(groupDetailsCache.admins)) {
+		admins = groupDetailsCache.admins;
+	} else if (currentGroup?.admins && Array.isArray(currentGroup.admins)) {
+		admins = currentGroup.admins;
+	} else if (currentGroup?.creatorId) {
+		admins = [currentGroup.creatorId];
+	}
+	
 	const isAdmin = currentUser?.id && admins.includes(currentUser.id);
+	
+	console.log('updateAdminControls:', { 
+		userId: currentUser?.id, 
+		admins, 
+		isAdmin, 
+		hasGroupDetailsCache: !!groupDetailsCache,
+		hasCurrentGroup: !!currentGroup 
+	});
 
 	if (editClubSettingsBtn) {
 		editClubSettingsBtn.disabled = !isAdmin;
