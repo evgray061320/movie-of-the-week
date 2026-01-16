@@ -1364,6 +1364,23 @@ function renderClubDetails(groupDetails = null) {
 	}
 	// Members list removed from club details - now in separate modal
 	updateHeaderClubName();
+	
+	// Ensure currentGroup has creatorId for admin checks
+	if (currentGroup && !currentGroup.creatorId) {
+		// Try to get it from groupDetailsCache or currentGroup fields
+		if (groupDetailsCache?.creatorId) {
+			currentGroup.creatorId = groupDetailsCache.creatorId;
+		} else if (groupDetailsCache?.creator_id) {
+			currentGroup.creatorId = groupDetailsCache.creator_id;
+		} else if (currentGroup.creator_id) {
+			currentGroup.creatorId = currentGroup.creator_id;
+		}
+		// Save if we updated it
+		if (currentGroup.creatorId) {
+			localStorage.setItem('movieClubGroup', JSON.stringify(currentGroup));
+		}
+	}
+	
 	updateAdminControls();
 	if (copyClubCodeBtn) {
 		copyClubCodeBtn.onclick = () => {
