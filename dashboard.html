@@ -111,6 +111,17 @@
         </div>
     </div>
 
+    <!-- Members Modal -->
+    <div id="members-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>👥 Club Members</h2>
+                <button class="modal-close" id="close-members-modal">&times;</button>
+            </div>
+            <div id="members-modal-list" class="details-list"></div>
+        </div>
+    </div>
+
     <!-- User Submissions Modal -->
     <div id="user-submissions-modal" class="modal hidden">
         <div class="modal-content" style="max-width: 800px;">
@@ -191,6 +202,7 @@
         </div>
         <div class="main-actions">
             <button type="button" id="open-club-details" class="btn btn-secondary">🎬 Club Details</button>
+            <button type="button" id="view-members-btn" class="btn btn-secondary">👥 View Members</button>
             <div id="club-details-popover" class="menu-popover hidden" aria-live="polite">
                 <div class="menu-popover-header">
                     <span>Club Details</span>
@@ -224,10 +236,6 @@
                     <div class="detail-row">
                         <span class="detail-label">Current Week</span>
                         <span id="club-current-week" class="detail-value"></span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Members</span>
-                        <span id="club-members" class="detail-value"></span>
                     </div>
                 </div>
                 <form id="club-settings-form" class="group-form hidden" style="margin-top: 1rem;">

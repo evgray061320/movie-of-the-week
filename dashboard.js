@@ -821,7 +821,7 @@ function setupProfileAndLogoutHandlers() {
 	clubSubmissionsPerUserEl = document.getElementById('club-submissions-per-user');
 	clubCategoriesEl = document.getElementById('club-categories');
 	clubCurrentWeekEl = document.getElementById('club-current-week');
-	clubMembersEl = document.getElementById('club-members');
+	// clubMembersEl removed - members now in separate modal
 	copyClubCodeBtn = document.getElementById('copy-club-code');
 	clubDetailsPopover = document.getElementById('club-details-popover');
 	closeClubDetailsBtn = document.getElementById('close-club-details');
@@ -845,6 +845,10 @@ function setupProfileAndLogoutHandlers() {
 	closeClubsModalBtn = document.getElementById('close-clubs-modal');
 	clubsModalListEl = document.getElementById('clubs-modal-list');
 	clubsModalStatusEl = document.getElementById('clubs-modal-status');
+	membersModal = document.getElementById('members-modal');
+	closeMembersModalBtn = document.getElementById('close-members-modal');
+	membersModalListEl = document.getElementById('members-modal-list');
+	viewMembersBtn = document.getElementById('view-members-btn');
 	userSubmissionsModal = document.getElementById('user-submissions-modal');
 	closeUserSubmissionsModalBtn = document.getElementById('close-user-submissions-modal');
 	userSubmissionsListEl = document.getElementById('user-submissions-list');
@@ -870,6 +874,25 @@ function setupProfileAndLogoutHandlers() {
 	if (closeClubsModalBtn && clubsModal) {
 		closeClubsModalBtn.addEventListener('click', () => {
 			clubsModal.classList.add('hidden');
+		});
+	}
+
+	// Members modal handlers
+	if (viewMembersBtn) {
+		viewMembersBtn.addEventListener('click', () => {
+			openMembersModal();
+		});
+	}
+
+	if (closeMembersModalBtn && membersModal) {
+		closeMembersModalBtn.addEventListener('click', () => {
+			membersModal.classList.add('hidden');
+		});
+	}
+
+	if (membersModal) {
+		membersModal.addEventListener('click', (e) => {
+			if (e.target === membersModal) membersModal.classList.add('hidden');
 		});
 	}
 
@@ -1253,21 +1276,7 @@ function renderClubDetails(groupDetails = null) {
 			clubCurrentWeekEl.textContent = 'Not available';
 		}
 	}
-	if (clubMembersEl) {
-		const members = groupDetailsCache?.memberDetails || [];
-		if (members.length > 0) {
-			const adminId = currentGroup.creatorId;
-			const names = members.map((member) => {
-				const label = member.username || member.name || 'Member';
-				return member.id === adminId ? `${label} (Admin)` : label;
-			});
-			clubMembersEl.textContent = names.join(', ');
-		} else if (currentGroup.members && currentGroup.members.length) {
-			clubMembersEl.textContent = `${currentGroup.members.length} member${currentGroup.members.length > 1 ? 's' : ''}`;
-		} else {
-			clubMembersEl.textContent = 'Not available';
-		}
-	}
+	// Members list removed from club details - now in separate modal
 	updateHeaderClubName();
 	updateAdminControls();
 	if (copyClubCodeBtn) {
@@ -1345,6 +1354,12 @@ function updateAdminControls() {
 	if (deleteClubBtn) {
 		deleteClubBtn.disabled = !isAdmin;
 		deleteClubBtn.textContent = isAdmin ? 'Delete Club' : 'Admin only';
+	}
+
+	// Hide/disable Club Details button for non-admins
+	if (openClubDetailsBtn) {
+		openClubDetailsBtn.disabled = !isAdmin;
+		openClubDetailsBtn.style.display = isAdmin ? '' : 'none';
 	}
 
 	// Hide/disable Pick Winner button for non-admins
