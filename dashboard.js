@@ -1416,10 +1416,17 @@ function updateHeaderClubName() {
 }
 
 function toggleClubDetails() {
-	if (!clubDetailsPopover) return;
+	if (!clubDetailsPopover) {
+		console.error('clubDetailsPopover is null!');
+		return;
+	}
+	console.log('Toggling club details popover, current state:', clubDetailsPopover.classList.contains('hidden'));
 	clubDetailsPopover.classList.toggle('hidden');
 	if (!clubDetailsPopover.classList.contains('hidden')) {
+		console.log('Opening club details popover');
 		renderClubDetails(groupDetailsCache);
+	} else {
+		console.log('Closing club details popover');
 	}
 }
 
@@ -1506,7 +1513,22 @@ function updateAdminControls() {
 	// Hide/disable Club Details button for non-admins
 	if (openClubDetailsBtn) {
 		openClubDetailsBtn.disabled = !isAdmin;
-		openClubDetailsBtn.style.display = isAdmin ? '' : 'none';
+		// Always show the button, but disable it if not admin
+		// This helps with debugging - we can see if the button exists
+		openClubDetailsBtn.style.display = '';
+		if (!isAdmin) {
+			openClubDetailsBtn.style.opacity = '0.5';
+			openClubDetailsBtn.style.cursor = 'not-allowed';
+		} else {
+			openClubDetailsBtn.style.opacity = '1';
+			openClubDetailsBtn.style.cursor = 'pointer';
+		}
+		console.log('Club Details button visibility:', {
+			buttonExists: !!openClubDetailsBtn,
+			isAdmin,
+			disabled: openClubDetailsBtn.disabled,
+			display: openClubDetailsBtn.style.display
+		});
 	}
 
 	// Hide/disable Pick Winner button for non-admins
