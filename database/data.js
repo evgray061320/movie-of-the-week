@@ -327,6 +327,24 @@ const data = {
     }
   },
   
+  async deleteSubmissionArchive(filters = {}) {
+    if (useDatabase && dbQueries) {
+      return await dbQueries.deleteSubmissionArchive(filters);
+    }
+    const json = loadJSON();
+    if (json.submissionArchive) {
+      let archive = json.submissionArchive;
+      if (filters.groupId !== undefined) {
+        archive = archive.filter(a => a.groupId !== filters.groupId);
+      }
+      if (filters.seasonNumber !== undefined) {
+        archive = archive.filter(a => a.seasonNumber !== filters.seasonNumber);
+      }
+      json.submissionArchive = archive;
+      saveJSON(json);
+    }
+  },
+  
   async reviews(filters = {}) {
     if (useDatabase && dbQueries) {
       return await dbQueries.getReviews(filters);
