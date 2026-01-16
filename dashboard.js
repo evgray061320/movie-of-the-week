@@ -1347,6 +1347,18 @@ function updateAdminControls() {
 		deleteClubBtn.textContent = isAdmin ? 'Delete Club' : 'Admin only';
 	}
 
+	// Hide/disable Pick Winner button for non-admins
+	if (pickNowBtn) {
+		pickNowBtn.disabled = !isAdmin;
+		pickNowBtn.style.display = isAdmin ? '' : 'none';
+	}
+
+	// Hide/disable Reset button for non-admins
+	if (resetBtn) {
+		resetBtn.disabled = !isAdmin;
+		resetBtn.style.display = isAdmin ? '' : 'none';
+	}
+
 	updateSeasonActionVisibility();
 	populateAdminSelect();
 	populateResetUserSelect();
@@ -1481,6 +1493,10 @@ pickNowBtn.addEventListener('click', async () => {
 
 if (resetBtn) {
 resetBtn.addEventListener('click', async () => {
+	if (!isCurrentUserAdmin()) {
+		alert('Only admins can reset submissions.');
+		return;
+	}
 	if (!confirm('Reset all submissions? This cannot be undone.')) return;
 	try {
 		const res = await fetch((SERVER_URL || '') + '/reset', { method: 'POST' });
