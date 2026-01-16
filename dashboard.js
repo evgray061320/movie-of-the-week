@@ -467,26 +467,50 @@ form.addEventListener('submit', async (e) => {
 // Show poster preview when title changes
 const titleInput = document.getElementById('title');
 let previewTimer;
+let lastFetchedTitle = '';
 if (titleInput) {
 titleInput.addEventListener('input', () => {
-	posterImg.hidden = true;
 	clearTimeout(previewTimer);
 	const value = titleInput.value.trim();
-	if (!value) return;
+	
+	// Only hide/show if value actually changed meaningfully
+	if (!value) {
+		if (!posterImg.hidden) {
+			posterImg.hidden = true;
+		}
+		return;
+	}
+	
+	// Skip if we're fetching the same title
+	if (value === lastFetchedTitle) return;
+	
 	previewTimer = setTimeout(async () => {
+		// Double-check the value hasn't changed during the timeout
+		const currentValue = titleInput.value.trim();
+		if (currentValue !== value) return;
+		
+		lastFetchedTitle = value;
 		const p = await fetchPoster(value);
-		if (p) {
+		
+		// Verify the input hasn't changed since fetch started
+		if (titleInput.value.trim() === value && p) {
 			posterImg.src = p;
 			posterImg.hidden = false;
 		}
-	}, 700);
+	}, 800); // Slightly longer debounce for mobile
 });
 }
 
-// Character counter for description
+// Character counter for description - throttled for performance
 if (descriptionEl) {
+	let charCounterTimer;
 	descriptionEl.addEventListener('input', () => {
-		if (charCountEl) charCountEl.textContent = descriptionEl.value.length;
+		clearTimeout(charCounterTimer);
+		charCounterTimer = setTimeout(() => {
+			if (charCountEl) {
+				charCountEl.textContent = descriptionEl.value.length;
+			}
+		}, 100); // Small delay to reduce frequent updates
 	});
 }
 
@@ -1895,27 +1919,49 @@ if (movieFormModal) {
 	const posterImgModal = document.getElementById('poster-img-modal');
 	let previewTimerModal;
 	
-	// Character count for modal
+	// Character count for modal - throttled for performance
 	if (descriptionModal && charCountModal) {
+		let charCounterTimerModal;
 		descriptionModal.addEventListener('input', () => {
-			charCountModal.textContent = descriptionModal.value.length;
+			clearTimeout(charCounterTimerModal);
+			charCounterTimerModal = setTimeout(() => {
+				charCountModal.textContent = descriptionModal.value.length;
+			}, 100); // Small delay to reduce frequent updates
 		});
 	}
 
 	// Poster preview when title changes
+	let lastFetchedTitleModal = '';
 	if (titleModal && posterImgModal) {
 		titleModal.addEventListener('input', () => {
-			posterImgModal.hidden = true;
 			clearTimeout(previewTimerModal);
 			const value = titleModal.value.trim();
-			if (!value) return;
+			
+			// Only hide/show if value actually changed meaningfully
+			if (!value) {
+				if (!posterImgModal.hidden) {
+					posterImgModal.hidden = true;
+				}
+				return;
+			}
+			
+			// Skip if we're fetching the same title
+			if (value === lastFetchedTitleModal) return;
+			
 			previewTimerModal = setTimeout(async () => {
+				// Double-check the value hasn't changed during the timeout
+				const currentValue = titleModal.value.trim();
+				if (currentValue !== value) return;
+				
+				lastFetchedTitleModal = value;
 				const posterUrl = await fetchPoster(value);
-				if (posterUrl) {
+				
+				// Verify the input hasn't changed since fetch started
+				if (titleModal.value.trim() === value && posterUrl) {
 					posterImgModal.src = posterUrl;
 					posterImgModal.hidden = false;
 				}
-			}, 600);
+			}, 800); // Slightly longer debounce for mobile
 		});
 	}
 	

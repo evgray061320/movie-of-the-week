@@ -1034,17 +1034,35 @@ select {
   justify-content: center;
   align-items: center;
   min-height: 180px;
-  animation: fadeIn 0.4s ease-out;
+  /* Prevent layout shifts from image loading */
+  contain: layout style;
+  will-change: contents;
+  /* Optimize for mobile */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 .poster-preview img {
   width: 160px;
   height: auto;
+  max-height: 240px;
   border-radius: 14px;
   box-shadow: 0 8px 32px rgba(233, 69, 96, 0.3);
-  transition: var(--transition);
+  transition: opacity 0.2s ease;
   object-fit: cover;
   border: 2px solid var(--accent);
+  /* Prevent image loading from causing layout shifts */
+  display: block;
+  opacity: 1;
+  will-change: opacity;
+}
+
+.poster-preview img[hidden] {
+  display: none;
+}
+
+.poster-preview img[src=""] {
+  display: none;
 }
 
 .poster-preview img:hover {
@@ -2055,6 +2073,30 @@ main:not(.main-hidden) {
     /* Disable background animation on mobile to prevent resize loop */
     background-size: 100% 100%;
     animation: none;
+    /* Optimize rendering performance */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Optimize form inputs for mobile performance */
+  .form-input,
+  .form-textarea,
+  .form-select {
+    /* Prevent layout shifts during input */
+    contain: layout style;
+    will-change: contents;
+    /* Disable transitions on mobile to reduce repaints */
+    transition: none;
+  }
+  
+  /* Optimize poster preview for mobile */
+  .poster-preview {
+    /* Reduce animation on mobile */
+    animation: none;
+  }
+  
+  .poster-preview img {
+    transition: opacity 0.15s ease;
   }
   
   /* Disable floating animations on mobile */
