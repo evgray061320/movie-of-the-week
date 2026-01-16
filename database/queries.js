@@ -79,7 +79,9 @@ async function getGroupById(id) {
 }
 
 async function getGroupByCode(code) {
-  const result = await query('SELECT * FROM groups WHERE code = $1', [code]);
+  // Normalize code to uppercase for consistent matching
+  const normalizedCode = String(code).trim().toUpperCase();
+  const result = await query('SELECT * FROM groups WHERE UPPER(TRIM(code)) = $1', [normalizedCode]);
   if (result.rows[0]) {
     const group = result.rows[0];
     group.settings = group.settings ? JSON.parse(group.settings) : null;

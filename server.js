@@ -540,11 +540,14 @@ app.post('/create-group', async (req, res) => {
   const groupId = Date.now().toString(36);
   const groupCode = Math.random().toString(36).substring(2, 8).toUpperCase();
   try {
+    // Ensure code is normalized (uppercase, trimmed)
+    const normalizedCode = String(groupCode).trim().toUpperCase();
+    console.log('Creating group with code:', normalizedCode);
     const group = await data.createGroup({
       id: groupId,
       name,
       creatorId,
-      code: groupCode,
+      code: normalizedCode,
       members: [creatorId],
       createdAt: new Date().toISOString(),
       settings: {
@@ -582,8 +585,14 @@ app.post('/join-group', async (req, res) => {
   const { userId, groupCode } = req.body || {};
   if (!userId || !groupCode) return res.status(400).json({ ok: false, error: 'missing userId or groupCode' });
   try {
-    const group = await data.getGroupByCode(groupCode);
-    if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
+    // Normalize code to uppercase (same as when creating)
+    const normalizedCode = String(groupCode).trim().toUpperCase();
+    console.log('Looking for group with code:', normalizedCode);
+    const group = await data.getGroupByCode(normalizedCode);
+    if (!group) {
+      console.log('Group not found with code:', normalizedCode);
+      return res.status(404).json({ ok: false, error: 'group not found' });
+    }
     const user = await data.getUserById(userId);
     if (!user) return res.status(404).json({ ok: false, error: 'user not found' });
     if (group.members.includes(userId)) return res.status(400).json({ ok: false, error: 'already a member' });

@@ -145,14 +145,18 @@ const data = {
   async getGroupByCode(code) {
     if (useDatabase && dbQueries) {
       try {
-        return await dbQueries.getGroupByCode(code);
+        const group = await dbQueries.getGroupByCode(code);
+        // If group found in database, return it (even if null)
+        // Only fall through to JSON if there was an actual error
+        if (group !== null) return group;
+        // If group is null (not found), still check JSON as fallback
       } catch (err) {
-        console.error('Database query failed, falling back to JSON:', err.message);
-        // Fall through to JSON fallback
+        console.error('Database query failed for getGroupByCode, falling back to JSON:', err.message);
+        // Fall through to JSON fallback on error
       }
     }
     const json = loadJSON();
-    return json.groups?.find(g => g.code === code);
+    return json.groups?.find(g => g.code === code) || null;
   },
   
   async createGroup(group) {
