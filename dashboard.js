@@ -1467,14 +1467,18 @@ function updateAdminControls() {
 	
 	const isAdmin = currentUser?.id && admins.includes(currentUser.id);
 	
-	// Debug logging (temporary - can remove after fixing)
-	// console.log('updateAdminControls:', {
-	// 	userId: currentUser?.id,
-	// 	admins,
-	// 	isAdmin,
-	// 	currentGroupCreatorId: currentGroup?.creatorId || currentGroup?.creator_id,
-	// 	hasGroupDetailsCache: !!groupDetailsCache
-	// });
+	// Debug logging (temporary - enable to diagnose admin issues)
+	console.log('updateAdminControls:', {
+		userId: currentUser?.id,
+		admins,
+		isAdmin,
+		currentGroupCreatorId: currentGroup?.creatorId || currentGroup?.creator_id,
+		currentGroupAdmins: currentGroup?.admins,
+		groupDetailsCacheAdmins: groupDetailsCache?.admins,
+		hasGroupDetailsCache: !!groupDetailsCache,
+		hasCurrentGroup: !!currentGroup,
+		currentGroupId: currentGroup?.id
+	});
 	
 	// Debug logging (can be removed in production)
 	// console.log('updateAdminControls:', { 
