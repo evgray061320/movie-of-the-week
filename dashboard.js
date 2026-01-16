@@ -679,6 +679,12 @@ async function switchToClub(club) {
 		if (groupDetails.creatorId && !currentGroup.creatorId) {
 			currentGroup.creatorId = groupDetails.creatorId;
 		}
+		// Also ensure creatorId is set from creator_id if needed
+		if (!currentGroup.creatorId && groupDetails.creator_id) {
+			currentGroup.creatorId = groupDetails.creator_id;
+		}
+		// Save updated currentGroup to localStorage
+		localStorage.setItem('movieClubGroup', JSON.stringify(currentGroup));
 		renderClubDetails(groupDetails);
 	} else {
 		renderClubDetails();
