@@ -2303,7 +2303,10 @@ async function leaveClub() {
 	}
 	
 	try {
-		const res = await fetch(`${SERVER_URL}/group/${currentGroup.id}/leave`, {
+		const url = `${SERVER_URL}/group/${currentGroup.id}/leave`;
+		console.log('Leaving club, calling:', url);
+		
+		const res = await fetch(url, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ userId: currentUser.id })
@@ -2311,7 +2314,13 @@ async function leaveClub() {
 		
 		if (!res.ok) {
 			const errorText = await res.text();
-			alert('Failed to leave club: ' + errorText);
+			console.error('Leave club error response:', res.status, errorText);
+			try {
+				const errorData = JSON.parse(errorText);
+				alert('Failed to leave club: ' + (errorData.error || errorText));
+			} catch (e) {
+				alert('Failed to leave club: ' + errorText);
+			}
 			return;
 		}
 		
@@ -2334,7 +2343,8 @@ async function leaveClub() {
 		window.location.href = 'welcome.html';
 	} catch (err) {
 		console.error('Failed to leave club', err);
-		alert('Network error. Make sure the server is running on port 3000.');
+		console.error('Error details:', err.message, err.stack);
+		alert('Network error: ' + (err.message || 'Make sure the server is running and has been restarted with the latest code.'));
 	}
 }
 
