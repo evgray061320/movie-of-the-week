@@ -531,6 +531,8 @@ function handleMenuAction(action) {
 		return;
 	}
 	if (action === 'groups-home') {
+		// Set flag to allow access to welcome page even if user has a club
+		sessionStorage.setItem('allowWelcomePage', 'true');
 		window.location.href = 'welcome.html';
 		return;
 	}

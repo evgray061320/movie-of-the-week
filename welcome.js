@@ -73,6 +73,15 @@ function checkAuth() {
       window.location.replace('login.html');
       return false;
     }
+    // Check if user explicitly wants to access welcome page (e.g., from Club Homepage button)
+    const allowWelcomePage = sessionStorage.getItem('allowWelcomePage');
+    if (allowWelcomePage === 'true') {
+      // Clear the flag so it doesn't persist
+      sessionStorage.removeItem('allowWelcomePage');
+      // Allow user to stay on welcome page even if they have a club
+      return false;
+    }
+    
     // User is logged in, check if they have a club
     const storedGroup = localStorage.getItem('movieClubGroup');
     if (storedGroup) {
