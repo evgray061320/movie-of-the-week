@@ -2309,7 +2309,19 @@ async function initialize() {
 		if (groupDetails.creatorId && !currentGroup.creatorId) {
 			currentGroup.creatorId = groupDetails.creatorId;
 		}
+		// Also ensure creatorId is set from creator_id if needed
+		if (!currentGroup.creatorId && groupDetails.creator_id) {
+			currentGroup.creatorId = groupDetails.creator_id;
+		}
+		// Save updated currentGroup to localStorage
+		localStorage.setItem('movieClubGroup', JSON.stringify(currentGroup));
+		// Render with group details (this will call updateAdminControls with correct data)
 		renderClubDetails(groupDetails);
+	} else {
+		// If groupDetails failed to load, still render with currentGroup data
+		renderClubDetails();
+		// Try to update admin controls based on currentGroup data
+		updateAdminControls();
 	}
 	
 	// Check if we should show submission modal on first login
