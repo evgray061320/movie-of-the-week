@@ -70,6 +70,9 @@ body {
   /* Prevent layout thrashing on Android */
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
+  /* Prevent layout shifts from animations */
+  will-change: auto;
+  contain: layout style paint;
 }
 
 /* Animated gradient background */
@@ -94,6 +97,9 @@ body::before {
   animation: float 20s ease-in-out infinite;
   pointer-events: none;
   z-index: 0;
+  /* Use transform for animations to avoid layout recalculations */
+  will-change: transform;
+  transform: translateZ(0); /* Force GPU acceleration */
 }
 
 body::after {
@@ -2031,22 +2037,38 @@ main:not(.main-hidden) {
     /* Lock viewport height on mobile to prevent zoom loop */
     height: 100%;
     height: -webkit-fill-available;
+    /* Prevent resize recalculation */
+    overflow: hidden;
   }
 
   body {
     /* Prevent viewport height changes on Android Chrome */
+    height: 100%;
+    height: -webkit-fill-available;
     min-height: 100vh;
     min-height: -webkit-fill-available;
     /* Prevent layout thrashing without breaking scroll */
     overflow-x: hidden;
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
+    /* Disable background animation on mobile to prevent resize loop */
+    background-size: 100% 100%;
+    animation: none;
+  }
+  
+  /* Disable floating animations on mobile */
+  body::before,
+  body::after {
+    animation: none;
   }
   
   /* Prevent address bar from causing layout shifts */
   main {
     min-height: 0;
     flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   header {
