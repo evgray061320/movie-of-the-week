@@ -536,6 +536,10 @@ function handleMenuAction(action) {
 		window.location.href = 'welcome.html';
 		return;
 	}
+	if (action === 'leave-club') {
+		leaveClub();
+		return;
+	}
 	if (action === 'logout') {
 		clearStoredUser();
 		localStorage.removeItem('movieClubGroup');
@@ -2286,6 +2290,52 @@ async function initialize() {
 
 function getActiveSeasonNumber() {
 	return selectedSeasonNumber || currentSeason?.seasonNumber || null;
+}
+
+async function leaveClub() {
+	if (!currentGroup?.id || !currentUser?.id) {
+		alert('Unable to leave club: missing club or user information');
+		return;
+	}
+	
+	if (!confirm('Are you sure you want to leave this club? You can rejoin later using the club code.')) {
+		return;
+	}
+	
+	try {
+		const res = await fetch(`${SERVER_URL}/group/${currentGroup.id}/leave`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ userId: currentUser.id })
+		});
+		
+		if (!res.ok) {
+			const errorText = await res.text();
+			alert('Failed to leave club: ' + errorText);
+			return;
+		}
+		
+		const data = await res.json();
+		if (!data.ok) {
+			alert('Failed to leave club: ' + (data.error || 'Unknown error'));
+			return;
+		}
+		
+		// Clear club from localStorage
+		localStorage.removeItem('movieClubGroup');
+		
+		// Update user's groupId to null
+		if (currentUser) {
+			currentUser.groupId = null;
+			setStoredUser(currentUser);
+		}
+		
+		// Redirect to welcome page
+		window.location.href = 'welcome.html';
+	} catch (err) {
+		console.error('Failed to leave club', err);
+		alert('Network error. Make sure the server is running on port 3000.');
+	}
 }
 
 function getEntrySeasonNumber(entry) {

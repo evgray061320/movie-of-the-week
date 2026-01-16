@@ -623,6 +623,39 @@ app.post('/join-group', async (req, res) => {
   }
 });
 
+app.post('/group/:id/leave', async (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.body || {};
+  if (!userId) return res.status(400).json({ ok: false, error: 'missing userId' });
+  try {
+    const group = await data.getGroupById(id);
+    if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
+    
+    if (!group.members || !group.members.includes(userId)) {
+      return res.status(400).json({ ok: false, error: 'user is not a member of this club' });
+    }
+    
+    // Remove user from members array
+    const updatedMembers = group.members.filter(memberId => memberId !== userId);
+    await data.updateGroup(id, { members: updatedMembers });
+    
+    // Remove user from admins array if they're an admin (but keep creator)
+    const admins = group.admins || [group.creator_id];
+    if (admins.includes(userId) && userId !== group.creator_id) {
+      const updatedAdmins = admins.filter(adminId => adminId !== userId);
+      await data.updateGroup(id, { admins: updatedAdmins });
+    }
+    
+    // Update user's groupId to null
+    await data.updateUser(userId, { groupId: null });
+    
+    res.json({ ok: true, message: 'Left club successfully' });
+  } catch (err) {
+    console.error('Leave group error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to leave club' });
+  }
+});
+
 app.put('/group/:id/settings', async (req, res) => {
   const { id } = req.params;
   const { name, description, seasonLength, submissionsPerUser, categories, userId } = req.body || {};
