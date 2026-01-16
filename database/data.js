@@ -143,9 +143,11 @@ const data = {
   },
   
   async getGroupByCode(code) {
+    // Normalize code to uppercase for consistent matching
+    const normalizedCode = String(code).trim().toUpperCase();
     if (useDatabase && dbQueries) {
       try {
-        const group = await dbQueries.getGroupByCode(code);
+        const group = await dbQueries.getGroupByCode(normalizedCode);
         // If group found in database, return it (even if null)
         // Only fall through to JSON if there was an actual error
         if (group !== null) return group;
@@ -156,7 +158,7 @@ const data = {
       }
     }
     const json = loadJSON();
-    return json.groups?.find(g => g.code === code) || null;
+    return json.groups?.find(g => String(g.code || '').trim().toUpperCase() === normalizedCode) || null;
   },
   
   async createGroup(group) {
