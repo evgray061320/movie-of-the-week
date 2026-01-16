@@ -662,6 +662,13 @@ async function switchToClub(club) {
 	loadGroupSettings();
 	const groupDetails = await loadGroupDetails();
 	if (groupDetails) {
+		// Update currentGroup with admin info from groupDetails
+		if (groupDetails.admins && !currentGroup.admins) {
+			currentGroup.admins = groupDetails.admins;
+		}
+		if (groupDetails.creatorId && !currentGroup.creatorId) {
+			currentGroup.creatorId = groupDetails.creatorId;
+		}
 		renderClubDetails(groupDetails);
 	} else {
 		renderClubDetails();
@@ -1424,13 +1431,14 @@ function updateAdminControls() {
 	
 	const isAdmin = currentUser?.id && admins.includes(currentUser.id);
 	
-	console.log('updateAdminControls:', { 
-		userId: currentUser?.id, 
-		admins, 
-		isAdmin, 
-		hasGroupDetailsCache: !!groupDetailsCache,
-		hasCurrentGroup: !!currentGroup 
-	});
+	// Debug logging (can be removed in production)
+	// console.log('updateAdminControls:', { 
+	// 	userId: currentUser?.id, 
+	// 	admins, 
+	// 	isAdmin, 
+	// 	hasGroupDetailsCache: !!groupDetailsCache,
+	// 	hasCurrentGroup: !!currentGroup 
+	// });
 
 	if (editClubSettingsBtn) {
 		editClubSettingsBtn.disabled = !isAdmin;
@@ -2246,6 +2254,13 @@ async function initialize() {
 
 	const groupDetails = await loadGroupDetails();
 	if (groupDetails) {
+		// Update currentGroup with admin info from groupDetails
+		if (groupDetails.admins && !currentGroup.admins) {
+			currentGroup.admins = groupDetails.admins;
+		}
+		if (groupDetails.creatorId && !currentGroup.creatorId) {
+			currentGroup.creatorId = groupDetails.creatorId;
+		}
 		renderClubDetails(groupDetails);
 	}
 	
