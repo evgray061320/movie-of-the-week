@@ -209,27 +209,27 @@ async function loadMyClubs() {
       
       // Add click handler to switch to this club and go to dashboard
       // Handle both click and touch events for mobile compatibility
-      if (!isCurrent) {
-        // Make button and card both clickable - use simple, reliable handlers
-        const handleSwitch = (e) => {
-          e.preventDefault();
+      // Make button and card both clickable - use simple, reliable handlers
+      const handleSwitch = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        switchToClub(club);
+      };
+      
+      // Button handler - works for both current and non-current clubs
+      const button = clubCard.querySelector('button');
+      if (button) {
+        // Touch events for mobile
+        button.addEventListener('touchstart', (e) => {
           e.stopPropagation();
-          switchToClub(club);
-        };
+        }, { passive: true });
         
-        // Button handler
-        const button = clubCard.querySelector('button');
-        if (button) {
-          // Touch events for mobile
-          button.addEventListener('touchstart', (e) => {
-            e.stopPropagation();
-          }, { passive: true });
-          
-          button.addEventListener('touchend', handleSwitch, { passive: false });
-          button.addEventListener('click', handleSwitch);
-        }
-        
-        // Card handler (for clicking anywhere on card, but not button)
+        button.addEventListener('touchend', handleSwitch, { passive: false });
+        button.addEventListener('click', handleSwitch);
+      }
+      
+      // Card handler (for clicking anywhere on card, but not button) - only for non-current clubs
+      if (!isCurrent) {
         const handleCardSwitch = (e) => {
           // Skip if clicking directly on button
           const buttonEl = clubCard.querySelector('button');
