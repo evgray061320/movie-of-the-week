@@ -93,6 +93,7 @@ let openClubDetailsBtn;
 let resetUserSelectEl;
 let resetUserBtn;
 let clubNameInput;
+let clubDescriptionInput;
 let seasonSelectEl;
 let selectedSeasonNumber = null;
 let latestHistory = [];
@@ -884,6 +885,7 @@ function setupProfileAndLogoutHandlers() {
 	editClubSettingsBtn = document.getElementById('edit-club-settings');
 	clubSettingsForm = document.getElementById('club-settings-form');
 	clubNameInput = document.getElementById('club-name-input');
+	clubDescriptionInput = document.getElementById('club-description-input');
 	clubSeasonLengthInput = document.getElementById('club-season-length-input');
 	clubSubmissionsInput = document.getElementById('club-submissions-input');
 	clubCategoriesInput = document.getElementById('club-categories-input');
@@ -990,6 +992,7 @@ function setupProfileAndLogoutHandlers() {
 			if (!currentGroup?.id) return;
 
 			const name = clubNameInput?.value.trim();
+			const description = clubDescriptionInput?.value.trim() || '';
 			const seasonLength = parseInt(clubSeasonLengthInput?.value, 10);
 			const submissionsPerUser = parseInt(clubSubmissionsInput?.value, 10);
 			const categoriesRaw = clubCategoriesInput?.value || '';
@@ -1022,7 +1025,7 @@ function setupProfileAndLogoutHandlers() {
 				const res = await fetch(`${SERVER_URL}/group/${currentGroup.id}/settings`, {
 					method: 'PUT',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ name, seasonLength, submissionsPerUser, categories, userId: currentUser?.id })
+					body: JSON.stringify({ name, description, seasonLength, submissionsPerUser, categories, userId: currentUser?.id })
 				});
 
 				if (!res.ok) {
@@ -1359,6 +1362,13 @@ function updateHeaderClubName() {
 	const name = currentGroup?.name || 'Movie Club';
 	headerClubNameEl.textContent = name;
 	document.title = `${name} — Dashboard`;
+	
+	// Update tagline/description
+	const taglineEl = document.querySelector('.tagline');
+	if (taglineEl) {
+		const description = groupDetailsCache?.description || currentGroup?.description || 'Bonding, in the digital age, over a love of all things cinematic';
+		taglineEl.textContent = description;
+	}
 }
 
 function toggleClubDetails() {

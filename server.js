@@ -513,6 +513,7 @@ app.get('/user/:id/clubs', async (req, res) => {
         return {
           id: group.id,
           name: group.name,
+          description: group.description,
           code: group.code,
           creatorId: group.creator_id,
           membersCount: group.members ? group.members.length : 0,
@@ -529,7 +530,7 @@ app.get('/user/:id/clubs', async (req, res) => {
 });
 
 app.post('/create-group', async (req, res) => {
-  const { name, creatorId, seasonLength, submissionsPerUser, categories } = req.body || {};
+  const { name, description, creatorId, seasonLength, submissionsPerUser, categories } = req.body || {};
   if (!name || !creatorId) return res.status(400).json({ ok: false, error: 'missing name or creatorId' });
   
   // Validate and set defaults for settings
@@ -546,6 +547,7 @@ app.post('/create-group', async (req, res) => {
     const group = await data.createGroup({
       id: groupId,
       name,
+      description: description || null,
       creatorId,
       code: normalizedCode,
       members: [creatorId],
@@ -563,6 +565,7 @@ app.post('/create-group', async (req, res) => {
     const apiGroup = {
       id: group.id,
       name: group.name,
+      description: group.description,
       creatorId: group.creator_id,
       code: group.code,
       members: group.members,
@@ -605,6 +608,7 @@ app.post('/join-group', async (req, res) => {
     const apiGroup = {
       id: group.id,
       name: group.name,
+      description: group.description,
       creatorId: group.creator_id,
       code: group.code,
       members: group.members,
@@ -621,7 +625,7 @@ app.post('/join-group', async (req, res) => {
 
 app.put('/group/:id/settings', async (req, res) => {
   const { id } = req.params;
-  const { name, seasonLength, submissionsPerUser, categories, userId } = req.body || {};
+  const { name, description, seasonLength, submissionsPerUser, categories, userId } = req.body || {};
   try {
     const group = await data.getGroupById(id);
     if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
@@ -640,18 +644,26 @@ app.put('/group/:id/settings', async (req, res) => {
       return res.status(400).json({ ok: false, error: 'invalid settings' });
     }
 
-    const updatedGroup = await data.updateGroup(id, {
+    const updateData = {
       name: trimmedName,
       settings: {
         seasonLength: validSeasonLength,
         submissionsPerUser: validSubmissionsPerUser,
         categories: validCategories
       }
-    });
+    };
+    
+    // Include description if provided
+    if (description !== undefined) {
+      updateData.description = String(description).trim() || null;
+    }
+    
+    const updatedGroup = await data.updateGroup(id, updateData);
     
     const apiGroup = {
       id: updatedGroup.id,
       name: updatedGroup.name,
+      description: updatedGroup.description,
       creatorId: updatedGroup.creator_id,
       code: updatedGroup.code,
       members: updatedGroup.members,
@@ -744,6 +756,7 @@ app.get('/group/:id', async (req, res) => {
     const apiGroup = {
       id: group.id,
       name: group.name,
+      description: group.description,
       creatorId: group.creator_id,
       code: group.code,
       members: group.members,

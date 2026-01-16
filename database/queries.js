@@ -54,10 +54,10 @@ async function updateUser(userId, updates) {
 // Groups
 async function createGroup(group) {
   const result = await query(
-    `INSERT INTO groups (id, name, creator_id, code, members, admins, settings, season, seasons, created_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    `INSERT INTO groups (id, name, description, creator_id, code, members, admins, settings, season, seasons, created_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
      RETURNING *`,
-    [group.id, group.name, group.creatorId, group.code, group.members || [], 
+    [group.id, group.name, group.description || null, group.creatorId, group.code, group.members || [], 
      group.admins || [], JSON.stringify(group.settings || {}), 
      JSON.stringify(group.season || null), JSON.stringify(group.seasons || []),
      group.createdAt || new Date()]
@@ -112,6 +112,10 @@ async function updateGroup(groupId, updates) {
   if (updates.name !== undefined) {
     fields.push(`name = $${paramCount++}`);
     values.push(updates.name);
+  }
+  if (updates.description !== undefined) {
+    fields.push(`description = $${paramCount++}`);
+    values.push(updates.description);
   }
   if (updates.members !== undefined) {
     fields.push(`members = $${paramCount++}`);

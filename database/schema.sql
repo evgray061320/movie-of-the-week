@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS groups (
     id VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    description TEXT, -- Club description/tagline
     creator_id VARCHAR(255) REFERENCES users(id),
     code VARCHAR(50) UNIQUE NOT NULL,
     members TEXT[], -- Array of user IDs

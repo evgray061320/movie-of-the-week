@@ -421,6 +421,7 @@ createGroupForm.addEventListener('submit', async (e) => {
 	}
 	
 	const clubName = document.getElementById('setup-club-name').value.trim();
+	const clubDescription = document.getElementById('setup-club-description')?.value.trim() || '';
 	const seasonLength = parseInt(document.getElementById('setup-season-length').value, 10);
 	const submissionsPerUser = parseInt(document.getElementById('setup-submissions-per-user').value, 10);
 	const rawCategoryNames = Array.from(document.querySelectorAll('.setup-category-input'))
@@ -467,7 +468,8 @@ createGroupForm.addEventListener('submit', async (e) => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ 
-				name: clubName, 
+				name: clubName,
+				description: clubDescription,
 				creatorId: userId,
 				seasonLength: seasonLength,
 				submissionsPerUser: submissionsPerUser,
