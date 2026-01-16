@@ -1331,13 +1331,28 @@ function hideProfile() {
 }
 
 function renderClubDetails(groupDetails = null) {
-	if (!clubDetailsPopover) return;
+	console.log('renderClubDetails called with:', {
+		hasPopover: !!clubDetailsPopover,
+		hasCurrentGroup: !!currentGroup,
+		hasGroupDetails: !!groupDetails,
+		groupDetailsAdmins: groupDetails?.admins,
+		groupDetailsCreatorId: groupDetails?.creatorId
+	});
+	if (!clubDetailsPopover) {
+		console.error('clubDetailsPopover is null in renderClubDetails!');
+		return;
+	}
 	if (!currentGroup) {
+		console.warn('currentGroup is null, hiding popover');
 		clubDetailsPopover.classList.add('hidden');
 		return;
 	}
 	if (groupDetails) {
 		groupDetailsCache = groupDetails;
+		console.log('Updated groupDetailsCache:', {
+			admins: groupDetailsCache.admins,
+			creatorId: groupDetailsCache.creatorId
+		});
 	}
 	if (clubNameEl) clubNameEl.textContent = currentGroup.name || 'Unnamed Club';
 	if (clubCodeEl) clubCodeEl.textContent = currentGroup.code || 'N/A';
@@ -1499,6 +1514,23 @@ function updateAdminControls() {
 	if (editClubSettingsBtn) {
 		editClubSettingsBtn.disabled = !isAdmin;
 		editClubSettingsBtn.textContent = isAdmin ? 'Edit' : 'Admin only';
+		// Always show the button for debugging
+		editClubSettingsBtn.style.display = '';
+		if (!isAdmin) {
+			editClubSettingsBtn.style.opacity = '0.5';
+			editClubSettingsBtn.style.cursor = 'not-allowed';
+		} else {
+			editClubSettingsBtn.style.opacity = '1';
+			editClubSettingsBtn.style.cursor = 'pointer';
+		}
+		console.log('Edit Club Settings button:', {
+			buttonExists: !!editClubSettingsBtn,
+			isAdmin,
+			disabled: editClubSettingsBtn.disabled,
+			textContent: editClubSettingsBtn.textContent
+		});
+	} else {
+		console.error('editClubSettingsBtn is null!');
 	}
 
 	if (adminSectionEl) {
