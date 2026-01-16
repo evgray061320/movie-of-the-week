@@ -1380,22 +1380,40 @@ function renderClubDetails(groupDetails = null) {
 	// Members list removed from club details - now in separate modal
 	updateHeaderClubName();
 	
-	// Ensure currentGroup has creatorId for admin checks
-	if (currentGroup && !currentGroup.creatorId) {
-		// Try to get it from groupDetailsCache or currentGroup fields
-		if (groupDetailsCache?.creatorId) {
-			currentGroup.creatorId = groupDetailsCache.creatorId;
-		} else if (groupDetailsCache?.creator_id) {
-			currentGroup.creatorId = groupDetailsCache.creator_id;
-		} else if (currentGroup.creator_id) {
-			currentGroup.creatorId = currentGroup.creator_id;
+	// Ensure currentGroup has creatorId and admins for admin checks
+	if (currentGroup) {
+		let updated = false;
+		// Sync creatorId
+		if (!currentGroup.creatorId) {
+			if (groupDetailsCache?.creatorId) {
+				currentGroup.creatorId = groupDetailsCache.creatorId;
+				updated = true;
+			} else if (groupDetailsCache?.creator_id) {
+				currentGroup.creatorId = groupDetailsCache.creator_id;
+				updated = true;
+			} else if (currentGroup.creator_id) {
+				currentGroup.creatorId = currentGroup.creator_id;
+				updated = true;
+			}
+		}
+		// Sync admins array
+		if (groupDetailsCache?.admins && Array.isArray(groupDetailsCache.admins)) {
+			if (!currentGroup.admins || JSON.stringify(currentGroup.admins) !== JSON.stringify(groupDetailsCache.admins)) {
+				currentGroup.admins = groupDetailsCache.admins;
+				updated = true;
+			}
 		}
 		// Save if we updated it
-		if (currentGroup.creatorId) {
+		if (updated) {
 			localStorage.setItem('movieClubGroup', JSON.stringify(currentGroup));
+			console.log('Updated currentGroup with admin data:', {
+				creatorId: currentGroup.creatorId,
+				admins: currentGroup.admins
+			});
 		}
 	}
 	
+	// Update admin controls AFTER syncing admin data
 	updateAdminControls();
 	if (copyClubCodeBtn) {
 		copyClubCodeBtn.onclick = () => {
