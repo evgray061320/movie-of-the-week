@@ -663,8 +663,13 @@ app.put('/group/:id/settings', async (req, res) => {
     const group = await data.getGroupById(id);
     if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
 
-    const admins = group.admins || [group.creator_id];
-    if (!userId || !admins.includes(userId)) {
+    // Check if user is admin: either in admins array OR is the creator
+    const admins = Array.isArray(group.admins) ? group.admins : [];
+    const isInAdminsArray = userId && admins.includes(userId);
+    const isCreator = userId && userId === group.creator_id;
+    const isAdmin = isInAdminsArray || isCreator;
+    
+    if (!userId || !isAdmin) {
       return res.status(403).json({ ok: false, error: 'only the club admin can edit settings' });
     }
 
@@ -720,8 +725,13 @@ app.post('/group/:id/season/start', async (req, res) => {
     const group = await data.getGroupById(id);
     if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
 
-    const admins = group.admins || [group.creator_id];
-    if (!userId || !admins.includes(userId)) {
+    // Check if user is admin: either in admins array OR is the creator
+    const admins = Array.isArray(group.admins) ? group.admins : [];
+    const isInAdminsArray = userId && admins.includes(userId);
+    const isCreator = userId && userId === group.creator_id;
+    const isAdmin = isInAdminsArray || isCreator;
+    
+    if (!userId || !isAdmin) {
       return res.status(403).json({ ok: false, error: 'only admins can start a new season' });
     }
 
@@ -827,8 +837,13 @@ app.post('/group/:id/admins', async (req, res) => {
     const group = await data.getGroupById(id);
     if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
 
-    const admins = group.admins || [group.creator_id];
-    if (!userId || !admins.includes(userId)) {
+    // Check if user is admin: either in admins array OR is the creator
+    const admins = Array.isArray(group.admins) ? group.admins : [];
+    const isInAdminsArray = userId && admins.includes(userId);
+    const isCreator = userId && userId === group.creator_id;
+    const isAdmin = isInAdminsArray || isCreator;
+    
+    if (!userId || !isAdmin) {
       return res.status(403).json({ ok: false, error: 'only admins can add admins' });
     }
     if (!adminId) {
@@ -856,8 +871,13 @@ app.post('/group/:id/delete', async (req, res) => {
     const group = await data.getGroupById(id);
     if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
 
-    const admins = group.admins || [group.creator_id];
-    if (!userId || !admins.includes(userId)) {
+    // Check if user is admin: either in admins array OR is the creator
+    const admins = Array.isArray(group.admins) ? group.admins : [];
+    const isInAdminsArray = userId && admins.includes(userId);
+    const isCreator = userId && userId === group.creator_id;
+    const isAdmin = isInAdminsArray || isCreator;
+    
+    if (!userId || !isAdmin) {
       return res.status(403).json({ ok: false, error: 'only admins can delete the club' });
     }
 
@@ -910,8 +930,13 @@ app.post('/group/:id/reset-user', async (req, res) => {
     const group = await data.getGroupById(id);
     if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
 
-    const admins = group.admins || [group.creator_id];
-    if (!userId || !admins.includes(userId)) {
+    // Check if user is admin: either in admins array OR is the creator
+    const admins = Array.isArray(group.admins) ? group.admins : [];
+    const isInAdminsArray = userId && admins.includes(userId);
+    const isCreator = userId && userId === group.creator_id;
+    const isAdmin = isInAdminsArray || isCreator;
+    
+    if (!userId || !isAdmin) {
       return res.status(403).json({ ok: false, error: 'only admins can reset user submissions' });
     }
     if (!targetUserId) {
@@ -1188,8 +1213,13 @@ app.get('/group/:id/submissions-summary', async (req, res) => {
     const group = await data.getGroupById(id);
     if (!group) return res.status(404).json({ ok: false, error: 'group not found' });
 
-    const admins = group.admins || [group.creator_id];
-    if (!userId || !admins.includes(userId)) {
+    // Check if user is admin: either in admins array OR is the creator
+    const admins = Array.isArray(group.admins) ? group.admins : [];
+    const isInAdminsArray = userId && admins.includes(userId);
+    const isCreator = userId && userId === group.creator_id;
+    const isAdmin = isInAdminsArray || isCreator;
+    
+    if (!userId || !isAdmin) {
       return res.status(403).json({ ok: false, error: 'only admins can view submission summary' });
     }
 
