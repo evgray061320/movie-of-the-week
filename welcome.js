@@ -264,6 +264,14 @@ async function loadMyClubs() {
 function switchToClub(club) {
   if (!club || !club.id) return;
   
+  // Clear any redirect flags that might prevent navigation
+  try {
+    sessionStorage.removeItem(REDIRECT_KEY);
+    sessionStorage.removeItem('allowWelcomePage');
+  } catch (e) {
+    // Ignore errors
+  }
+  
   // Update current user's groupId
   const currentUser = loadCurrentUser();
   if (currentUser) {
@@ -274,8 +282,15 @@ function switchToClub(club) {
   // Save club to localStorage
   localStorage.setItem('movieClubGroup', JSON.stringify(club));
   
+  // Clear redirect flag to allow dashboard access
+  try {
+    sessionStorage.removeItem(REDIRECT_KEY);
+  } catch (e) {
+    // Ignore errors
+  }
+  
   // Navigate to dashboard
-  window.location.replace('dashboard.html');
+  window.location.href = 'dashboard.html';
 }
 
 // Simple HTML escape function
