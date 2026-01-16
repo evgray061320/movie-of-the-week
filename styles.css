@@ -37,7 +37,7 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto; /* Changed from smooth to prevent scroll jumps */
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   text-size-adjust: 100%;
@@ -47,6 +47,9 @@ html {
   /* Prevent viewport height changes on mobile browsers */
   height: 100%;
   height: -webkit-fill-available;
+  /* Prevent automatic scroll restoration */
+  scroll-padding: 0;
+  scroll-margin: 0;
 }
 
 body {
@@ -2055,19 +2058,24 @@ main:not(.main-hidden) {
     /* Lock viewport height on mobile to prevent zoom loop */
     height: 100%;
     height: -webkit-fill-available;
-    /* Prevent resize recalculation */
-    overflow: hidden;
+    /* Allow scrolling on html level - don't use overflow: hidden */
+    overflow-x: hidden;
+    overflow-y: auto;
+    /* Prevent smooth scroll from causing issues */
+    scroll-behavior: auto;
+    /* Prevent scroll restoration */
+    scroll-padding-top: 0;
   }
 
   body {
     /* Prevent viewport height changes on Android Chrome */
-    height: 100%;
-    height: -webkit-fill-available;
     min-height: 100vh;
     min-height: -webkit-fill-available;
+    /* Body should not have fixed height - let content flow */
+    height: auto;
     /* Prevent layout thrashing without breaking scroll */
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: visible;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
     /* Disable background animation on mobile to prevent resize loop */
@@ -2076,6 +2084,9 @@ main:not(.main-hidden) {
     /* Optimize rendering performance */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Prevent automatic scrolling on focus */
+    scroll-margin: 0;
+    scroll-padding: 0;
   }
   
   /* Optimize form inputs for mobile performance */
@@ -2087,6 +2098,18 @@ main:not(.main-hidden) {
     will-change: contents;
     /* Disable transitions on mobile to reduce repaints */
     transition: none;
+    /* Prevent automatic scrolling on focus */
+    scroll-margin: 0;
+    scroll-padding: 0;
+  }
+  
+  /* Prevent inputs from causing scroll jumps on focus */
+  .form-input:focus,
+  .form-textarea:focus,
+  .form-select:focus {
+    /* Don't allow browser to auto-scroll to focused input */
+    scroll-margin-block: 0;
+    scroll-padding-block: 0;
   }
   
   /* Optimize poster preview for mobile */
@@ -2109,8 +2132,11 @@ main:not(.main-hidden) {
   main {
     min-height: 0;
     flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    /* Main should not scroll - body/html handles scrolling */
+    overflow-y: visible;
+    overflow-x: hidden;
+    /* Prevent scroll position issues */
+    position: relative;
   }
 
   header {
