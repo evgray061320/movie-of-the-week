@@ -1041,6 +1041,10 @@ function setupProfileAndLogoutHandlers() {
 				}
 
 				currentGroup = data.group;
+				// Ensure currentGroup has creatorId for admin checks
+				if (data.group && !currentGroup.creatorId && data.group.creatorId) {
+					currentGroup.creatorId = data.group.creatorId;
+				}
 				localStorage.setItem('movieClubGroup', JSON.stringify(currentGroup));
 				loadGroupSettings();
 				renderClubDetails(data.group);
