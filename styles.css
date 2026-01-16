@@ -2037,15 +2037,16 @@ main:not(.main-hidden) {
     /* Prevent viewport height changes on Android Chrome */
     min-height: 100vh;
     min-height: -webkit-fill-available;
-    /* Prevent layout thrashing */
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow-y: auto;
+    /* Prevent layout thrashing without breaking scroll */
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+  
+  /* Prevent address bar from causing layout shifts */
+  main {
+    min-height: 0;
+    flex: 1;
   }
 
   header {
