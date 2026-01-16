@@ -37,19 +37,15 @@
 }
 
 html {
-  scroll-behavior: auto; /* Changed from smooth to prevent scroll jumps */
+  scroll-behavior: smooth; /* Smooth scroll on desktop */
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   text-size-adjust: 100%;
   /* Android Chrome fix for preventing zoom on input focus */
   -webkit-tap-highlight-color: rgba(212, 175, 55, 0.3);
   tap-highlight-color: rgba(212, 175, 55, 0.3);
-  /* Prevent viewport height changes on mobile browsers */
-  height: 100%;
-  height: -webkit-fill-available;
-  /* Prevent automatic scroll restoration */
-  scroll-padding: 0;
-  scroll-margin: 0;
+  /* Only apply height constraints on mobile - don't restrict desktop */
+  /* height constraints moved to mobile media query only */
 }
 
 body {
@@ -65,17 +61,11 @@ body {
   animation: gradientShift 20s ease infinite;
   color: var(--text-primary);
   line-height: 1.65;
-  /* Use -webkit-fill-available for mobile to prevent viewport zoom loop */
+  /* Normal height behavior on desktop - min-height only */
   min-height: 100vh;
-  min-height: -webkit-fill-available;
   position: relative;
   overflow-x: hidden;
-  /* Prevent layout thrashing on Android */
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  /* Prevent layout shifts from animations */
-  will-change: auto;
-  contain: layout style paint;
+  /* -webkit-fill-available only applied on mobile */
 }
 
 /* Animated gradient background */
