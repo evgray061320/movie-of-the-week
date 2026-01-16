@@ -68,7 +68,12 @@ const data = {
   
   async getUserById(id) {
     if (useDatabase && dbQueries) {
-      return await dbQueries.getUserById(id);
+      try {
+        return await dbQueries.getUserById(id);
+      } catch (err) {
+        console.error('Database query failed, falling back to JSON:', err.message);
+        // Fall through to JSON fallback
+      }
     }
     const json = loadJSON();
     return json.users?.find(u => u.id === id);
@@ -76,7 +81,12 @@ const data = {
   
   async getUserByUsername(username) {
     if (useDatabase && dbQueries) {
-      return await dbQueries.getUserByUsername(username);
+      try {
+        return await dbQueries.getUserByUsername(username);
+      } catch (err) {
+        console.error('Database query failed, falling back to JSON:', err.message);
+        // Fall through to JSON fallback
+      }
     }
     const json = loadJSON();
     return json.users?.find(u => (u.username || '').toLowerCase() === username.toLowerCase());
@@ -108,7 +118,12 @@ const data = {
   
   async groups() {
     if (useDatabase && dbQueries) {
-      return await dbQueries.getAllGroups();
+      try {
+        return await dbQueries.getAllGroups();
+      } catch (err) {
+        console.error('Database query failed, falling back to JSON:', err.message);
+        // Fall through to JSON fallback
+      }
     }
     const json = loadJSON();
     return json.groups || [];
@@ -116,7 +131,12 @@ const data = {
   
   async getGroupById(id) {
     if (useDatabase && dbQueries) {
-      return await dbQueries.getGroupById(id);
+      try {
+        return await dbQueries.getGroupById(id);
+      } catch (err) {
+        console.error('Database query failed, falling back to JSON:', err.message);
+        // Fall through to JSON fallback
+      }
     }
     const json = loadJSON();
     return json.groups?.find(g => g.id === id);
@@ -124,7 +144,12 @@ const data = {
   
   async getGroupByCode(code) {
     if (useDatabase && dbQueries) {
-      return await dbQueries.getGroupByCode(code);
+      try {
+        return await dbQueries.getGroupByCode(code);
+      } catch (err) {
+        console.error('Database query failed, falling back to JSON:', err.message);
+        // Fall through to JSON fallback
+      }
     }
     const json = loadJSON();
     return json.groups?.find(g => g.code === code);
