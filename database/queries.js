@@ -314,6 +314,27 @@ async function getSubmissionArchive(filters = {}) {
   }));
 }
 
+async function deleteSubmissionArchive(filters = {}) {
+  let sql = 'DELETE FROM submission_archive WHERE 1=1';
+  const params = [];
+  let paramCount = 1;
+  
+  if (filters.groupId !== undefined) {
+    sql += ` AND group_id = $${paramCount++}`;
+    params.push(filters.groupId);
+  }
+  if (filters.seasonNumber !== undefined) {
+    sql += ` AND season_number = $${paramCount++}`;
+    params.push(filters.seasonNumber);
+  }
+  if (params.length === 0) {
+    sql = 'DELETE FROM submission_archive';
+    params = [];
+  }
+  
+  await query(sql, params);
+}
+
 // History (Winners)
 async function createHistoryEntry(entry) {
   const result = await query(
@@ -620,6 +641,7 @@ module.exports = {
   // Submission Archive
   createSubmissionArchive,
   getSubmissionArchive,
+  deleteSubmissionArchive,
   
   // History
   createHistoryEntry,

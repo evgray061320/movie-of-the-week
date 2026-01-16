@@ -897,13 +897,21 @@ app.post('/group/:id/delete', async (req, res) => {
       // Continue with deletion even if user update fails
     }
 
-    // Remove group submissions and history
+    // Remove group submissions and submission archive
     try {
       await data.deleteSubmissions({ groupId: id });
       console.log(`Deleted submissions for group ${id}`);
     } catch (err) {
       console.error(`Error deleting submissions for group ${id}:`, err);
       // Continue with deletion even if submissions fail
+    }
+
+    try {
+      await data.deleteSubmissionArchive({ groupId: id });
+      console.log(`Deleted submission archive for group ${id}`);
+    } catch (err) {
+      console.error(`Error deleting submission archive for group ${id}:`, err);
+      // Continue with deletion even if archive fails
     }
 
     try {
