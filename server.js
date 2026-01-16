@@ -892,23 +892,67 @@ app.post('/group/:id/delete', async (req, res) => {
     }
 
     // Remove group submissions and history
-    await data.deleteSubmissions({ groupId: id });
-    await data.deleteHistory({ groupId: id });
+    try {
+      await data.deleteSubmissions({ groupId: id });
+      console.log(`Deleted submissions for group ${id}`);
+    } catch (err) {
+      console.error(`Error deleting submissions for group ${id}:`, err);
+      // Continue with deletion even if submissions fail
+    }
+
+    try {
+      await data.deleteHistory({ groupId: id });
+      console.log(`Deleted history for group ${id}`);
+    } catch (err) {
+      console.error(`Error deleting history for group ${id}:`, err);
+      // Continue with deletion even if history fails
+    }
 
     // Remove group reviews and watched entries
-    await data.deleteReviews({ groupId: id });
-    await data.deleteWatched({ groupId: id });
+    try {
+      await data.deleteReviews({ groupId: id });
+      console.log(`Deleted reviews for group ${id}`);
+    } catch (err) {
+      console.error(`Error deleting reviews for group ${id}:`, err);
+      // Continue with deletion even if reviews fail
+    }
+
+    try {
+      await data.deleteWatched({ groupId: id });
+      console.log(`Deleted watched entries for group ${id}`);
+    } catch (err) {
+      console.error(`Error deleting watched entries for group ${id}:`, err);
+      // Continue with deletion even if watched fails
+    }
 
     // Remove group user submission tracking
-    await data.deleteUserSubmissionsByGroup(id);
+    try {
+      await data.deleteUserSubmissionsByGroup(id);
+      console.log(`Deleted user submissions for group ${id}`);
+    } catch (err) {
+      console.error(`Error deleting user submissions for group ${id}:`, err);
+      // Continue with deletion even if user submissions fail
+    }
     
     // Delete the group
-    await data.deleteGroup(id);
+    try {
+      await data.deleteGroup(id);
+      console.log(`Deleted group ${id}`);
+    } catch (err) {
+      console.error(`Error deleting group ${id}:`, err);
+      throw err; // Re-throw group deletion error as it's critical
+    }
 
     res.json({ ok: true });
   } catch (err) {
     console.error('Delete group error:', err);
-    res.status(500).json({ ok: false, error: 'Failed to delete group' });
+    console.error('Error details:', {
+      message: err.message,
+      stack: err.stack,
+      groupId: id,
+      userId: userId
+    });
+    res.status(500).json({ ok: false, error: 'Failed to delete group: ' + (err.message || 'Unknown error') });
   }
 });
 
