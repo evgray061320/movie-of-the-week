@@ -884,11 +884,17 @@ app.post('/group/:id/delete', async (req, res) => {
     // Remove group (deleted via data.deleteGroup below)
 
     // Clear group membership on users
-    const allUsers = await data.users();
-    for (const user of allUsers) {
-      if (user.group_id === id) {
-        await data.updateUser(user.id, { groupId: null });
+    try {
+      const allUsers = await data.users();
+      for (const user of allUsers) {
+        if (user.group_id === id) {
+          await data.updateUser(user.id, { groupId: null });
+        }
       }
+      console.log(`Cleared group membership for group ${id}`);
+    } catch (err) {
+      console.error(`Error clearing group membership for group ${id}:`, err);
+      // Continue with deletion even if user update fails
     }
 
     // Remove group submissions and history
