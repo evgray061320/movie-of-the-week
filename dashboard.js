@@ -678,6 +678,58 @@ async function switchToClub(club) {
 	if (clubsModal) clubsModal.classList.add('hidden');
 }
 
+function openMembersModal() {
+	if (!membersModal) {
+		membersModal = document.getElementById('members-modal');
+	}
+	if (!membersModal) return;
+	membersModal.classList.remove('hidden');
+	renderMembersModal();
+}
+
+function closeMembersModal() {
+	if (membersModal) membersModal.classList.add('hidden');
+}
+
+function renderMembersModal() {
+	if (!membersModalListEl) {
+		membersModalListEl = document.getElementById('members-modal-list');
+	}
+	if (!membersModalListEl) return;
+	
+	const members = groupDetailsCache?.memberDetails || [];
+	const admins = groupDetailsCache?.admins || (currentGroup ? [currentGroup.creatorId] : []);
+	
+	if (members.length === 0) {
+		if (currentGroup?.members && currentGroup.members.length > 0) {
+			membersModalListEl.innerHTML = `<p class="no-reviews">Loading member details...</p>`;
+			// Try to load member details
+			loadGroupDetails().then(() => {
+				renderMembersModal(); // Re-render after loading
+			});
+			return;
+		} else {
+			membersModalListEl.innerHTML = '<p class="no-reviews">No members found.</p>';
+			return;
+		}
+	}
+	
+	membersModalListEl.innerHTML = '';
+	members.forEach((member) => {
+		const isAdmin = admins.includes(member.id);
+		const isCreator = member.id === currentGroup?.creatorId;
+		const row = document.createElement('div');
+		row.className = 'detail-row';
+		const name = member.username || member.name || 'Unknown Member';
+		const adminBadge = isAdmin || isCreator ? '<span style="background: var(--gold); color: var(--bg-dark); padding: 0.25rem 0.5rem; border-radius: 8px; font-size: 0.75rem; font-weight: 700; margin-left: 0.5rem;">ADMIN</span>' : '';
+		row.innerHTML = `
+			<span class="detail-label">${escapeHtml(name)}${adminBadge}</span>
+			<span class="detail-value">${member.email || 'No email'}</span>
+		`;
+		membersModalListEl.appendChild(row);
+	});
+}
+
 function openUserSubmissionsModal() {
 	if (!userSubmissionsModal) {
 		userSubmissionsModal = document.getElementById('user-submissions-modal');
