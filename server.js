@@ -940,12 +940,19 @@ app.post('/group/:id/delete', async (req, res) => {
       // Continue with deletion even if user submissions fail
     }
     
-    // Delete the group
+    // Delete the group (must be last due to foreign key constraints)
     try {
       await data.deleteGroup(id);
-      console.log(`Deleted group ${id}`);
+      console.log(`Successfully deleted group ${id}`);
     } catch (err) {
       console.error(`Error deleting group ${id}:`, err);
+      console.error('Group deletion failed. This might be due to foreign key constraints.');
+      console.error('Error details:', {
+        message: err.message,
+        code: err.code,
+        detail: err.detail,
+        constraint: err.constraint
+      });
       throw err; // Re-throw group deletion error as it's critical
     }
 
