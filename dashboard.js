@@ -530,6 +530,10 @@ function handleMenuAction(action) {
 		openClubsModal();
 		return;
 	}
+	if (action === 'groups-home') {
+		window.location.href = 'welcome.html';
+		return;
+	}
 	if (action === 'logout') {
 		clearStoredUser();
 		localStorage.removeItem('movieClubGroup');
