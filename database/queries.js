@@ -69,10 +69,10 @@ async function getGroupById(id) {
   const result = await query('SELECT * FROM groups WHERE id = $1', [id]);
   if (result.rows[0]) {
     const group = result.rows[0];
-    // Parse JSON fields
-    group.settings = group.settings ? JSON.parse(group.settings) : null;
-    group.season = group.season ? JSON.parse(group.season) : null;
-    group.seasons = group.seasons ? JSON.parse(group.seasons) : [];
+    // JSONB fields are already parsed by pg driver - only parse if string
+    group.settings = group.settings && typeof group.settings === 'string' ? JSON.parse(group.settings) : (group.settings || null);
+    group.season = group.season && typeof group.season === 'string' ? JSON.parse(group.season) : (group.season || null);
+    group.seasons = group.seasons && typeof group.seasons === 'string' ? JSON.parse(group.seasons) : (group.seasons || []);
     return group;
   }
   return null;
@@ -84,9 +84,10 @@ async function getGroupByCode(code) {
   const result = await query('SELECT * FROM groups WHERE UPPER(TRIM(code)) = $1', [normalizedCode]);
   if (result.rows[0]) {
     const group = result.rows[0];
-    group.settings = group.settings ? JSON.parse(group.settings) : null;
-    group.season = group.season ? JSON.parse(group.season) : null;
-    group.seasons = group.seasons ? JSON.parse(group.seasons) : [];
+    // JSONB fields are already parsed by pg driver - only parse if string
+    group.settings = group.settings && typeof group.settings === 'string' ? JSON.parse(group.settings) : (group.settings || null);
+    group.season = group.season && typeof group.season === 'string' ? JSON.parse(group.season) : (group.season || null);
+    group.seasons = group.seasons && typeof group.seasons === 'string' ? JSON.parse(group.seasons) : (group.seasons || []);
     return group;
   }
   return null;
@@ -95,9 +96,10 @@ async function getGroupByCode(code) {
 async function getAllGroups() {
   const result = await query('SELECT * FROM groups ORDER BY created_at DESC');
   return result.rows.map(group => {
-    group.settings = group.settings ? JSON.parse(group.settings) : null;
-    group.season = group.season ? JSON.parse(group.season) : null;
-    group.seasons = group.seasons ? JSON.parse(group.seasons) : [];
+    // JSONB fields are already parsed by pg driver - only parse if string
+    group.settings = group.settings && typeof group.settings === 'string' ? JSON.parse(group.settings) : (group.settings || null);
+    group.season = group.season && typeof group.season === 'string' ? JSON.parse(group.season) : (group.season || null);
+    group.seasons = group.seasons && typeof group.seasons === 'string' ? JSON.parse(group.seasons) : (group.seasons || []);
     return group;
   });
 }
@@ -140,9 +142,10 @@ async function updateGroup(groupId, updates) {
   );
   if (result.rows[0]) {
     const group = result.rows[0];
-    group.settings = group.settings ? JSON.parse(group.settings) : null;
-    group.season = group.season ? JSON.parse(group.season) : null;
-    group.seasons = group.seasons ? JSON.parse(group.seasons) : [];
+    // JSONB fields are already parsed by pg driver - only parse if string
+    group.settings = group.settings && typeof group.settings === 'string' ? JSON.parse(group.settings) : (group.settings || null);
+    group.season = group.season && typeof group.season === 'string' ? JSON.parse(group.season) : (group.season || null);
+    group.seasons = group.seasons && typeof group.seasons === 'string' ? JSON.parse(group.seasons) : (group.seasons || []);
     return group;
   }
   return null;
@@ -319,8 +322,9 @@ async function createHistoryEntry(entry) {
   const row = result.rows[0];
   return {
     id: row.id,
-    winners: JSON.parse(row.winners),
-    winner: row.winner ? JSON.parse(row.winner) : null,
+    // JSONB fields are already parsed by pg driver - only parse if string
+    winners: row.winners && typeof row.winners === 'string' ? JSON.parse(row.winners) : (row.winners || []),
+    winner: row.winner && typeof row.winner === 'string' ? JSON.parse(row.winner) : (row.winner || null),
     pickedAt: row.picked_at,
     submissionsCount: row.submissions_count,
     groupId: row.group_id,
@@ -351,8 +355,9 @@ async function getHistory(filters = {}) {
   const result = await query(sql, params);
   return result.rows.map(row => ({
     id: row.id,
-    winners: JSON.parse(row.winners),
-    winner: row.winner ? JSON.parse(row.winner) : null,
+    // JSONB fields are already parsed by pg driver - only parse if string
+    winners: row.winners && typeof row.winners === 'string' ? JSON.parse(row.winners) : (row.winners || []),
+    winner: row.winner && typeof row.winner === 'string' ? JSON.parse(row.winner) : (row.winner || null),
     pickedAt: row.picked_at,
     submissionsCount: row.submissions_count,
     groupId: row.group_id,
@@ -491,7 +496,9 @@ async function deleteWatched(filters = {}) {
 async function getUserSubmissions(seasonKey) {
   const result = await query('SELECT * FROM user_submissions WHERE season_key = $1', [seasonKey]);
   if (result.rows[0]) {
-    return JSON.parse(result.rows[0].submissions);
+    // JSONB fields are already parsed by pg driver - only parse if string
+    const submissions = result.rows[0].submissions;
+    return submissions && typeof submissions === 'string' ? JSON.parse(submissions) : (submissions || []);
   }
   return [];
 }
