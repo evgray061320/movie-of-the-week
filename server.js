@@ -786,6 +786,12 @@ app.get('/group/:id', async (req, res) => {
     const memberPromises = (group.members || []).map(id => data.getUserById(id));
     const members = (await Promise.all(memberPromises)).filter(u => u);
     
+    // Ensure creator is always in admins array
+    const admins = group.admins || [];
+    if (!admins.includes(group.creator_id)) {
+      admins.push(group.creator_id);
+    }
+    
     const apiGroup = {
       id: group.id,
       name: group.name,
@@ -793,7 +799,7 @@ app.get('/group/:id', async (req, res) => {
       creatorId: group.creator_id,
       code: group.code,
       members: group.members,
-      admins: group.admins || [group.creator_id],
+      admins: admins,
       settings: group.settings,
       season: group.season,
       seasons: group.seasons,

@@ -1505,16 +1505,27 @@ function updateAdminControls() {
 		admins = [currentGroup.creator_id];
 	}
 	
-	const isAdmin = currentUser?.id && admins.includes(currentUser.id);
+	// Check if user is admin: either in admins array OR is the creator
+	const isInAdminsArray = currentUser?.id && admins.includes(currentUser.id);
+	const isCreator = currentUser?.id && (
+		currentGroup?.creatorId === currentUser.id || 
+		currentGroup?.creator_id === currentUser.id ||
+		groupDetailsCache?.creatorId === currentUser.id ||
+		groupDetailsCache?.creator_id === currentUser.id
+	);
+	const isAdmin = isInAdminsArray || isCreator;
 	
 	// Debug logging (temporary - enable to diagnose admin issues)
 	console.log('updateAdminControls:', {
 		userId: currentUser?.id,
 		admins,
+		isInAdminsArray,
+		isCreator,
 		isAdmin,
 		currentGroupCreatorId: currentGroup?.creatorId || currentGroup?.creator_id,
 		currentGroupAdmins: currentGroup?.admins,
 		groupDetailsCacheAdmins: groupDetailsCache?.admins,
+		groupDetailsCacheCreatorId: groupDetailsCache?.creatorId || groupDetailsCache?.creator_id,
 		hasGroupDetailsCache: !!groupDetailsCache,
 		hasCurrentGroup: !!currentGroup,
 		currentGroupId: currentGroup?.id
