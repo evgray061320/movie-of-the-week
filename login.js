@@ -46,6 +46,7 @@ try {
 }
 
 // Check if user is already logged in, redirect appropriately
+// NOTE: Disabled auto-redirect - root URL should always show login page
 function checkAuth() {
   // Don't check if we're already on dashboard or welcome
   if (window.location.pathname.includes('dashboard.html') || 
@@ -53,6 +54,11 @@ function checkAuth() {
     return false;
   }
 
+  // DISABLED: Always show login page, even if user is logged in
+  // Users must explicitly navigate to dashboard or welcome pages
+  return false;
+  
+  /* OLD CODE - Auto-redirect disabled
   // Check if we're already redirecting - prevent multiple redirects
   if (sessionStorage.getItem(REDIRECT_KEY)) {
     return true;
@@ -97,6 +103,7 @@ function checkAuth() {
     }
   }
   return false;
+  */
 }
 
 // Initialize login page
