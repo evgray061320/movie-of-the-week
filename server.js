@@ -282,35 +282,26 @@ async function pickWinnersByCategory({ groupId = null } = {}) {
   if (groupSubmissionCount === 0) return null;
 
   const seasonWinnerTitles = await getSeasonWinnerTitles({ groupId, seasonNumber });
-  const chosenTitles = new Set();
-  const winners = [];
-  const skippedCategories = [];
+  
+  // Pick ONE winner from all categories combined (randomly)
+  // Get all eligible submissions from all categories
+  const eligible = relevantSubmissions.filter((submission) => {
+    const normalized = normalizeTitle(submission.title);
+    if (seasonWinnerTitles.has(normalized)) return false;
+    return true;
+  });
 
-  // Use for...of loop to handle async operations properly
-  for (const category of categories) {
-    const eligible = relevantSubmissions.filter((submission) => {
-      if (submission.category !== category) return false;
-      const normalized = normalizeTitle(submission.title);
-      if (seasonWinnerTitles.has(normalized)) return false;
-      if (chosenTitles.has(normalized)) return false;
-      return true;
-    });
+  if (!eligible.length) return null;
 
-    if (!eligible.length) {
-      skippedCategories.push(category);
-      continue;
-    }
-
-    const winner = eligible[Math.floor(Math.random() * eligible.length)];
-    const submitter = await data.getUserById(winner.userId);
-    const winnerClone = Object.assign({}, winner, {
-      submittedBy: submitter?.name || submitter?.username || 'Unknown'
-    });
-    winners.push(winnerClone);
-    chosenTitles.add(normalizeTitle(winner.title));
-  }
-
-  if (!winners.length) return null;
+  // Randomly pick one winner from all eligible submissions
+  const winner = eligible[Math.floor(Math.random() * eligible.length)];
+  const submitter = await data.getUserById(winner.user_id || winner.userId);
+  const winnerClone = Object.assign({}, winner, {
+    submittedBy: submitter?.name || submitter?.username || 'Unknown',
+    userId: winner.user_id || winner.userId // Ensure userId is set
+  });
+  
+  const winners = [winnerClone];
 
   const entry = {
     id: Date.now().toString(36),
@@ -323,22 +314,21 @@ async function pickWinnersByCategory({ groupId = null } = {}) {
   };
 
   await data.createHistoryEntry(entry);
-  return { winners, entry, skippedCategories };
+  return { winners, entry };
 }
 
 app.post('/pick-weekly', async (req, res) => {
   const { groupId } = req.body || {};
   const result = await pickWinnersByCategory({ groupId: groupId || null });
   if (!result) return res.json({ ok: false, message: 'No submissions available to pick' });
-  const winnerTitles = result.winners.map(w => w.title).filter(Boolean).join(', ');
-  const skipped = result.skippedCategories.length
-    ? ` Skipped: ${result.skippedCategories.join(', ')}.`
-    : '';
+  const winner = result.winners[0];
+  const winnerTitle = winner?.title || 'Unknown';
   res.json({
     ok: true,
     winners: result.winners,
+    winner: winner, // Single winner for backwards compatibility
     historyEntry: result.entry,
-    message: winnerTitles ? `Picked ${winnerTitles}.${skipped}` : `Picked winners.${skipped}`
+    message: `Picked: ${winnerTitle}`
   });
 });
 

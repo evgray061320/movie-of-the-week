@@ -1699,7 +1699,7 @@ pickNowBtn.addEventListener('click', async () => {
 		alert('Only admins can pick this week\'s winners.');
 		return;
 	}
-	if (!confirm('Pick this week\'s winners for every category? This will record the picks and reveal them.')) return;
+	if (!confirm('Pick this week\'s winner? One movie will be randomly selected from all submissions. This will record the pick and reveal it.')) return;
 	
 	pickNowBtn.disabled = true;
 	pickNowBtn.textContent = 'Picking...';
@@ -1715,7 +1715,9 @@ pickNowBtn.addEventListener('click', async () => {
 				statusEl.textContent = data.message || 'Picked winners';
 				statusEl.className = 'status success';
 			}
-			renderCurrentWinner(data.winners || [], data.historyEntry);
+			// Handle both single winner and array of winners for backwards compatibility
+			const winnerToDisplay = data.winner || (data.winners && data.winners[0]) || null;
+			renderCurrentWinner(winnerToDisplay ? [winnerToDisplay] : (data.winners || []), data.historyEntry);
 			// Refresh history first, then refresh list to show revealed winner
 			await refreshHistory();
 			await refreshList();
@@ -1780,21 +1782,26 @@ async function refreshHistory() {
 function renderCurrentWinner(winner, historyEntry) {
   const winners = Array.isArray(winner) ? winner : (winner ? [winner] : []);
   if (!winners.length) { 
-    currentWinnerEl.innerHTML = '<div class="winner-placeholder">No winner selected yet</div>';
+    currentWinnerEl.innerHTML = '<div class="winner-placeholder">🎬 No winner selected yet</div>';
     // Refresh discussion board to show appropriate message
     refreshDiscussionBoard();
     return;
   }
   const fallbackPoster = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="140" height="200"%3E%3Crect fill="%23ccc" width="100%25" height="100%25"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="14" fill="%23666" text-anchor="middle" dominant-baseline="middle"%3ENo Poster%3C/text%3E%3C/svg%3E';
   const winnerLines = winners.map((entry) => {
-	const categoryLabel = entry.category ? ` <span style="opacity: 0.75;">(${escapeHtml(entry.category)})</span>` : '';
-	const posterSrc = entry.posterUrl || fallbackPoster;
+	const categoryLabel = entry.category ? ` <span style="opacity: 0.75; font-size: 0.9em;">(${escapeHtml(entry.category)})</span>` : '';
+	const posterSrc = entry.poster_url || entry.posterUrl || fallbackPoster;
+	const submitterName = entry.submittedBy || entry.submitted_by || 'Unknown';
+	const description = entry.description || '';
 	return `
-		<div style="display: grid; grid-template-columns: 140px 1fr; gap: 1.5rem; align-items: center; margin-bottom: 1.5rem;">
+		<div style="display: grid; grid-template-columns: 140px 1fr; gap: 1.5rem; align-items: start; margin-bottom: 1.5rem;">
 			<img src="${posterSrc}" alt="${escapeHtml(entry.title)} poster" style="width: 140px; border-radius: 12px; border: 2px solid var(--border-color); box-shadow: var(--shadow-md);">
 			<div>
-				<strong>${escapeHtml(entry.title)}</strong>${categoryLabel}
-				<p>${escapeHtml(entry.description || '')}</p>
+				<h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">${escapeHtml(entry.title)}${categoryLabel}</h3>
+				${description ? `<p style="margin: 0 0 0.75rem 0; color: var(--text-secondary); line-height: 1.5;">${escapeHtml(description)}</p>` : ''}
+				<p style="margin: 0; font-size: 0.9em; color: var(--text-secondary);">
+					<strong>Submitted by:</strong> ${escapeHtml(submitterName)}
+				</p>
 			</div>
 		</div>
 	`;
